@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Recipa</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="error_weak_password">Weak password</string>
+    <string name="error_invalid_email">Email not valid</string>
+    <string name="error_user_exists">User exists</string>
+</resources>

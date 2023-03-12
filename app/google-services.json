@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "721609902633",
+    "project_id": "recipa-e3b07",
+    "storage_bucket": "recipa-e3b07.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:721609902633:android:c5602bb7c037dcfde6ea38",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "721609902633-63ti8r2s7ursr8vjcmgheb1pigb3v6uk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9mD9Lh2-Rl9czjy3UuTw0T5PVb0NWffk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "721609902633-63ti8r2s7ursr8vjcmgheb1pigb3v6uk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

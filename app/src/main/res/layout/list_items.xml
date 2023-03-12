@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/ivImage"
+            android:layout_width="62dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:maxWidth="62dp"
+            android:maxHeight="62dp"
+            android:scaleType="fitXY"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/favorites_icon" />
+
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/urbanist_medium"
+            android:text="title"
+            android:textColor="#000000"
+            android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:paddingTop="5dp"
+                android:text="date"
+                android:textColor="#6A6A6A"
+                android:textSize="15dp" />
+
+
+
+
+
+    </LinearLayout>
+
+</LinearLayout>
+    <TextView
+        android:id="@+id/tvSubTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="asda"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="20dp"/>
+</LinearLayout>

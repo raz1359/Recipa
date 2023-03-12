@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FragmentLogin2">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <ImageView
+        android:id="@+id/imageView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/salad2" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/imageView11"
+        android:layout_marginTop="80dp"
+        android:id="@+id/rl1">
+
+
+
+        <TextView
+            android:id="@+id/address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/worksans_regular"
+            android:text="E-mail address:"
+            android:textColor="#4F4F4F"
+            android:textSize="20dp"
+
+            android:layout_marginTop="34dp"
+            android:layout_marginStart="20dp"
+
+            />
+
+        <EditText
+            android:id="@+id/editTextEmail"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:paddingLeft="10dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/address"
+
+            android:background="@drawable/login_button"
+            android:ems="10"
+            android:inputType="textEmailAddress" />
+
+        <TextView
+            android:id="@+id/EnterPassword"
+            android:layout_width="232dp"
+            android:layout_height="wrap_content"
+
+            android:fontFamily="@font/worksans_regular"
+            android:text="Enter password::"
+
+            android:layout_below="@id/editTextEmail"
+            android:layout_marginTop="20dp"
+
+            android:textColor="#4F4F4F"
+            android:textSize="20dp"
+            android:layout_marginStart="20dp"/>
+
+        <EditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+
+            android:paddingLeft="10dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginRight="20dp"
+            android:layout_centerHorizontal="true"
+
+            android:layout_below="@id/EnterPassword"
+
+
+            android:background="@drawable/login_button"
+            android:ems="10"
+            android:inputType="textPassword" />
+
+        <CheckBox
+            android:id="@+id/cbRemember"
+            android:layout_width="172dp"
+            android:layout_height="38dp"
+            android:layout_below="@id/editTextPassword"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            android:buttonTint="@color/black"
+            android:fontFamily="@font/worksans_regular"
+
+            android:text="Remember me"
+            android:textColor="#3D3D3D"
+            android:textSize="17dp" />
+
+        <Button
+            android:id="@+id/create"
+            android:layout_width="296dp"
+            android:layout_height="62dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/circle"
+            android:fontFamily="@font/urbanist_medium"
+            android:text="Login"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+
+            android:layout_below="@id/cbRemember"
+            android:layout_marginTop="136dp"
+
+            />
+
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>
