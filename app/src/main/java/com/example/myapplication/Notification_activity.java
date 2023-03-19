@@ -20,7 +20,7 @@ import java.util.Date;
 
 public class Notification_activity extends AppCompatActivity implements View.OnClickListener {
 
-    ImageView button;
+    ImageView imageView;
     ArrayList<Item> notificationList;
     ListView lv;
     MyAdapter myAdapter;
@@ -33,7 +33,7 @@ public class Notification_activity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
 
-        Bitmap heart = BitmapFactory.decodeResource(getResources(),R.drawable.heart_notification);
+        Bitmap heart = BitmapFactory.decodeResource(getResources(), R.drawable.heart_notification);
         Bitmap user = BitmapFactory.decodeResource(getResources(),R.drawable.user_notification);
 
         Item t1 = new Item("'Name' Add Your Recipe", "aa" , "Your italy pasta been add to Raz Vorman Favorite list" , heart);
@@ -48,7 +48,8 @@ public class Notification_activity extends AppCompatActivity implements View.OnC
         lv = findViewById(R.id.lv);
         lv.setAdapter(myAdapter);
 
-        button = findViewById(R.id.ivBack);
+        imageView = findViewById(R.id.ivBack);
+        imageView.setOnClickListener(this);
 
     }
 

@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import org.w3c.dom.Text;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -23,12 +25,11 @@ public class MyAdapter extends ArrayAdapter<Item> {
     Context context;
     List <Item> objects;
     private static final String TAG = "razz";
+    SimpleDateFormat format1 = new SimpleDateFormat("d MMM,yyyy" + " | " + "hh:hh a");
+    Date currentTime = Calendar.getInstance().getTime();
+    String strFormat1 = format1.format(currentTime);
 
-   Date currentTime = Calendar.getInstance().getTime();
-   //String formattedDate = DateFormat.getDateInstance(DateFormat.AM_PM_FIELD).format(currentTime);
-
-   //String[] splitDate = formattedDate.split(" | ");
-
+    String formattedDate = DateFormat.getDateInstance(DateFormat.DATE_FIELD).format(currentTime);
 
     public MyAdapter(Context context, int resource, int textViewResourceld, List<Item> objects) {
         super(context, resource, textViewResourceld ,objects);
@@ -50,7 +51,7 @@ public class MyAdapter extends ArrayAdapter<Item> {
         Item temp = objects.get(position);
 
         ivImage.setImageBitmap(temp.getBitmap());
-        tvDate.setText(currentTime.toString());
+        tvDate.setText(strFormat1);
         tvTitle.setText(temp.getTitle());
         tvSubTitle.setText(temp.getSubtitle());
 
@@ -58,10 +59,8 @@ public class MyAdapter extends ArrayAdapter<Item> {
 
         
         Log.d(TAG, currentTime.toString());
-        //Log.d(TAG, formattedDate);
-        //Log.d(TAG, splitDate[0].trim());
-        //Log.d(TAG, splitDate[1].trim());
-        //Log.d(TAG, splitDate[2].trim());
+        Log.d(TAG, formattedDate);
+        Log.d(TAG, strFormat1);
 
 
         return convertView;
