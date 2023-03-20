@@ -13,7 +13,7 @@
         android:id="@+id/btnSignout"
         android:layout_width="209dp"
         android:layout_height="94dp"
-        android:layout_alignBottom="@id/notification"
+        android:layout_marginTop="500dp"
         android:text="signout"></Button>
 
     <ImageView

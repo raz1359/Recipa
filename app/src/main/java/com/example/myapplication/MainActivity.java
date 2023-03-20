@@ -32,6 +32,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageView = findViewById(R.id.notification);
         imageView.setOnClickListener(this);
 
+        imageView = findViewById(R.id.emptyProfile);
+        imageView.setOnClickListener(this);
+
     }
 
 
@@ -47,6 +50,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case R.id.notification:
                         intent = new Intent(this, Notification_activity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.emptyProfile:
+                        intent = new Intent(this, FillProfile.class);
                         startActivity(intent);
                 }
 
