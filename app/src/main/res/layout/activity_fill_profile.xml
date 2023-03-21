@@ -8,7 +8,7 @@
     tools:context=".FillProfile">
 
 
-    <TextView
+    <Button
         android:id="@+id/btnContinue"
         android:layout_width="347dp"
         android:layout_height="59dp"
@@ -17,6 +17,7 @@
         android:gravity="center"
         android:onClick="onCreate"
         android:text="Continue"
+        android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="22sp"
         android:layout_alignParentBottom="true"
