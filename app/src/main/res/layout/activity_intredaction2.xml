@@ -34,7 +34,7 @@
         android:layout_marginBottom="224dp"
         android:fontFamily="@font/urbanist_semiboldltalic"
         android:gravity="center"
-        android:text="Shere Your Disehs"
+        android:text="Share Your Dishes"
         android:textColor="#1BAC4B"
         android:textSize="30sp" />
 
@@ -49,7 +49,7 @@
         android:layout_marginBottom="119dp"
         android:fontFamily="@font/urbanist_medium"
         android:gravity="center"
-        android:text="shere you recipes to others to recive recipes from others user"
+        android:text="Share you recipes to others and to receive recipes from others users"
         android:textColor="#5A5A5A"
         android:textSize="20sp" />
 

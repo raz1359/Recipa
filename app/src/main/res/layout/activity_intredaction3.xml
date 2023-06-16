@@ -49,7 +49,7 @@
         android:layout_marginBottom="119dp"
         android:fontFamily="@font/urbanist_medium"
         android:gravity="center"
-        android:text="add the recipes Ingredients to your groceries to buy just the thing you need"
+        android:text="Add the recipes and ingredients to your groceries to buy just the things you need"
         android:textColor="#5A5A5A"
         android:textSize="20sp" />
 

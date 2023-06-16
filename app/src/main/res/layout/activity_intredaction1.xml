@@ -61,7 +61,7 @@
         android:layout_marginBottom="119dp"
         android:fontFamily="@font/urbanist_medium"
         android:gravity="center"
-        android:text="find the most suitable food for you \n discover new recipes every day"
+        android:text="Find the most suitable food for you \n  to discover new recipes"
         android:textColor="#5A5A5A"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
