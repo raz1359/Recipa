@@ -36,7 +36,8 @@ public class FragmentLogin1 extends Fragment implements View.OnClickListener {
     static EditText etEmail,etPassword, etPasswordConfirm;
     Button btnCreate;
     private static final String TAG = "Raz";
-    Context currentContext;
+    public Context currentContext;
+
 
     public FragmentLogin1(Context currentContext) {
         this.currentContext = currentContext;
@@ -72,6 +73,7 @@ public class FragmentLogin1 extends Fragment implements View.OnClickListener {
         String emailTemp = etEmail.getText().toString().trim();
         String passwordTemp = etPassword.getText().toString().trim();
         String passwordConfrimTemp = etPasswordConfirm.getText().toString().trim();
+
 
 
         Log.d(TAG, "email: " + emailTemp + " password: " + passwordTemp + " confirm password: " + passwordConfrimTemp

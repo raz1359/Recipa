@@ -49,7 +49,7 @@
         />
 
     <ImageView
-        android:id="@+id/ivChangePic"
+        android:id="@+id/profileImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tvFillYourProfile"
@@ -64,7 +64,7 @@
         android:hint="Full name"
         android:textColorHint="#B8B8B8"
         android:textSize="14dp"
-        android:layout_below="@id/ivChangePic"
+        android:layout_below="@id/profileImage"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
         />
@@ -80,8 +80,7 @@
         android:layout_below="@id/etfullName"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="35dp"
-
         />
 
-
 </RelativeLayout>
+
