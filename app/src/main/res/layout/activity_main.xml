@@ -63,7 +63,6 @@
         android:hint="What are you looking for?"
         android:paddingLeft="55dp"
         android:paddingTop="8dp"
-
         android:paddingRight="20dp"
         android:paddingBottom="8dp"
         android:textColor="@color/black"
@@ -132,15 +131,15 @@
 
             <Button
                 android:layout_width="150dp"
-                android:layout_height="wrap_content"
+                android:layout_height="118dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
-                android:fontFamily="@font/urbanist_medium"
                 android:backgroundTint="@color/white"
                 android:drawableRight="@drawable/lunch_logo"
                 android:drawablePadding="-50dp"
+                android:fontFamily="@font/urbanist_medium"
                 android:gravity="left"
                 android:text="Lunch"
                 android:textAllCaps="false"

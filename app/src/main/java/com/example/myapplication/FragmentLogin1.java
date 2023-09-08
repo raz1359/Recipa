@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.Button;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,10 +35,13 @@ import java.util.concurrent.Executor;
 public class FragmentLogin1 extends Fragment implements View.OnClickListener {
 
     View view;
+    ImageView icon;
+    TextView passwordFail;
     static EditText etEmail,etPassword, etPasswordConfirm;
     Button btnCreate;
     private static final String TAG = "Raz";
     public Context currentContext;
+
 
 
     public FragmentLogin1(Context currentContext) {
@@ -63,6 +68,8 @@ public class FragmentLogin1 extends Fragment implements View.OnClickListener {
         etPassword = view.findViewById(R.id.editTextPassword);
         etPasswordConfirm = view.findViewById(R.id.editTextConfirmPassword);
         btnCreate = view.findViewById(R.id.create);
+        icon = view.findViewById(R.id.icon_error);
+        passwordFail = view.findViewById(R.id.passwordNotEqual);
 
         btnCreate.setOnClickListener(this);
     }
@@ -83,9 +90,17 @@ public class FragmentLogin1 extends Fragment implements View.OnClickListener {
             Log.d(TAG, "before create");
                 createAccount(emailTemp, passwordTemp);
             Log.d(TAG, "After create");
-        } else
-            etPasswordConfirm.setError("password not Equalse");
+        } else {
+            //etPasswordConfirm.setError("password not Equalse");
+            //etPassword.setText("");
+            //etPasswordConfirm.setText("");
+           //etPassword.setHintTextColor(getResources().getColor(R.color.red));
+            //etPasswordConfirm.setHintTextColor(getResources().getColor(R.color.red));
+            //icon.setAlpha(1);         need to change icon Alpha to 1 so you can see it
+            passwordFail.setAlpha(1);
 
+
+        }
 
 
     }

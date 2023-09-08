@@ -1,10 +1,12 @@
 package com.example.myapplication;
 
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,13 +23,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.prefs.Preferences;
 
 public class FillProfile extends AppCompatActivity implements View.OnClickListener {
@@ -36,12 +47,17 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
 
     private static final String TAG = "raz";
     public Button button;
-    public ImageView imageView;
+    public ImageView imageView, profilePic;
+    public Uri imageUri;
     public EditText fullName, nickname;
     public String uID;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
+    FirebaseStorage storage;
+    StorageReference storageReference;
 
+
+    // Connect to real time database
     DatabaseReference  datebaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +72,9 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
 
         nickname = findViewById(R.id.etnickname);
         nickname.setOnClickListener(this);
+
+        profilePic = findViewById(R.id.profileImage);
+        profilePic.setOnClickListener(this);
         Log.d(TAG, "after");
 
         button = findViewById(R.id.btnContinue);
@@ -64,6 +83,19 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         final SharedPreferences pref2 = PreferenceManager.getDefaultSharedPreferences(this);
 
 
+        button.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                final String tempName = fullName.getText().toString();
+                final String tempNickname = nickname.getText().toString();
+
+                 datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).child("Fullname").setValue(tempName);
+                 datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).child("Nickname").setValue(tempNickname);
+
+            }
+        });
 
         fullName.setText(pref1.getString(NameLast_text, ""));
         fullName.addTextChangedListener(new TextWatcher() {
@@ -85,6 +117,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
 
         });
 
+
         nickname.setText(pref2.getString(NicknameLast_name, ""));
         nickname.addTextChangedListener(new TextWatcher() {
             @Override
@@ -104,19 +137,12 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
             }
         });
 
-
-        button.setOnClickListener(new View.OnClickListener() {
-
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+        profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
-                final String tempName = fullName.getText().toString();
-                final String tempNickname = nickname.getText().toString();
-
-                 datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).child("Fullname").setValue(tempName);
-                 datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).child("Nickname").setValue(tempNickname);
-                // datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).child("Email").setValue(email);
-
+            public void onClick(View view) {
+                choosePicture();
             }
         });
 
@@ -128,6 +154,55 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
     }
 
 
+    private void choosePicture() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent,1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null){
+            imageUri = data.getData();
+            profilePic.setImageURI(imageUri);
+            uploadPicture();
+        }
+    }
+
+    private void uploadPicture() {
+
+        final ProgressDialog pd = new ProgressDialog(this);
+        pd.setTitle("Uploading Image...");
+        pd.show();
+
+        final String randomKey = UUID.randomUUID().toString();
+        StorageReference riverRef = storageReference.child("image/" + randomKey);
+
+        riverRef.putFile(imageUri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        pd.dismiss();
+                        Snackbar.make(findViewById(android.R.id.content), "Image Uploaded.", Snackbar.LENGTH_LONG).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        pd.dismiss();
+                        Toast.makeText(getApplicationContext(), "Failed To Upload", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                        double progressPercent = (100.00 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                        pd.setMessage("Progress: " + (int) progressPercent + "%");
+                    }
+                });
+    }
 
     @Override
     public void onClick(View view) {
