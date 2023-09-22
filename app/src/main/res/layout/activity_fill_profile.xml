@@ -53,8 +53,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tvFillYourProfile"
+        android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"
         app:srcCompat="@drawable/profile" />
+
 
     <EditText
         android:id="@+id/etfullName"

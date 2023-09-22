@@ -91,13 +91,14 @@ public class FragmentLogin1 extends Fragment implements View.OnClickListener {
                 createAccount(emailTemp, passwordTemp);
             Log.d(TAG, "After create");
         } else {
-            //etPasswordConfirm.setError("password not Equalse");
-            //etPassword.setText("");
-            //etPasswordConfirm.setText("");
-           //etPassword.setHintTextColor(getResources().getColor(R.color.red));
-            //etPasswordConfirm.setHintTextColor(getResources().getColor(R.color.red));
-            //icon.setAlpha(1);         need to change icon Alpha to 1 so you can see it
-            passwordFail.setAlpha(1);
+            // etPasswordConfirm.setError("password not Equalse");
+            // etPassword.setText("");
+            // etPasswordConfirm.setText("");
+            // etPassword.setHintTextColor(getResources().getColor(R.color.red));
+            // etPasswordConfirm.setHintTextColor(getResources().getColor(R.color.red));
+            // icon.setAlpha(1);
+            // ס    passwordFail.setAlpha(1);
+            // need to change icon Alpha to 1 so you can see it
 
 
         }

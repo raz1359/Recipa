@@ -10,6 +10,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -36,7 +37,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.prefs.Preferences;
@@ -139,9 +142,11 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
+
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 choosePicture();
             }
         });
@@ -180,12 +185,20 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         final String randomKey = UUID.randomUUID().toString();
         StorageReference riverRef = storageReference.child("image/" + randomKey);
 
-        riverRef.putFile(imageUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        riverRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         pd.dismiss();
                         Snackbar.make(findViewById(android.R.id.content), "Image Uploaded.", Snackbar.LENGTH_LONG).show();
+                        datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).child("ProfileImage").setValue(imageUri.toString());
+
+                        riverRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Picasso.get().load(uri).resize(370,370).centerCrop().into(profilePic);
+                                datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).child("ProfileImage").setValue(uri.toString());
+                            }
+                        });
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

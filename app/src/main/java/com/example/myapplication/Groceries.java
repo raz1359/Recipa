@@ -1,54 +1,42 @@
 package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class Search extends AppCompatActivity {
+public class Groceries extends AppCompatActivity {
 
-    public ImageView searchImage;
-    public EditText searchBar;
+    boolean isList;
     private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.activity_groceries);
 
-        searchImage= findViewById(R.id.searchIcon);
 
-//        searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View view, boolean hasFocus) {
-//                if (hasFocus) {
-//                    searchBar.setBackground(ContextCompat.getDrawable(Search.this, R.drawable.edit_text_search_selected));
-//                    searchImage.setImageResource(R.drawable.searchbar_onpng);
-//                } else {
-//                    searchBar.setBackground(ContextCompat.getDrawable(Search.this, R.drawable.edit_text_search));
-//                    searchImage.setImageResource(R.drawable.search_icon2);
-//                }
-//            }
-//        });
+        if (isList == false) {
+            findViewById(R.id.tvDescription).setAlpha(1);
+            findViewById(R.id.tvEmpty).setAlpha(1);
+            findViewById(R.id.lady_empty).setAlpha(1);
+        } //else (עדיין צריך להמשיך)
 
         bottomNavigationView = findViewById(R.id.bottomNavBar);
-        bottomNavigationView.setSelectedItemId(R.id.searchBT);
+        bottomNavigationView.setSelectedItemId(R.id.shoppingBT);
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()){
-                case R.id.searchBT:
+                case R.id.shoppingBT:
                     return true;
 
-                case R.id.shoppingBT:
+                case R.id.searchBT:
                     //startActivity(new Intent(getApplicationContext(), Search.class));
-                    Intent intent = new Intent(this, Groceries.class);
+                    Intent intent = new Intent(this, Search.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivityForResult(intent,0);
                     finish();
@@ -63,7 +51,6 @@ public class Search extends AppCompatActivity {
             }
             return false;
         });
-
 
     }
 }

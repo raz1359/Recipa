@@ -60,10 +60,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case R.id.searchBT:
                     //startActivity(new Intent(getApplicationContext(), Search.class));
                     Intent intent = new Intent(this, Search.class);
-                    startActivity(intent);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivityForResult(intent,0);
                     finish();
                     return true;
-
+                case R.id.shoppingBT:
+                    Intent intent1 = new Intent(this, Groceries.class);
+                    intent1.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivityForResult(intent1,0);
+                    finish();
+                    return true;
 
             }
             return false;
@@ -94,15 +100,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d(TAG, "onClick: ");
                 mAuth.signOut();
                 intent = new Intent(this, login.class);
-                startActivity(intent);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivityForResult(intent,0);
                 break;
             case R.id.notification:
                 intent = new Intent(this, Notification_activity.class);
-                startActivity(intent);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivityForResult(intent,0);
                 break;
             case R.id.emptyProfile:
                 intent = new Intent(this, FillProfile.class);
-                startActivity(intent);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivityForResult(intent,0);
         }
     }
 

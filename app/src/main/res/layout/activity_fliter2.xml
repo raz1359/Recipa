@@ -15,8 +15,7 @@
         android:fontFamily="@font/urbanist_semiboldltalic"
         android:gravity="center"
         android:shadowRadius="20"
-        android:text="Do You Have
-Any allergies?"
+        android:text="Do You Have Any allergies?"
         android:textColor="#1BAC4B"
         android:textSize="37sp"
         app:layout_constraintEnd_toEndOf="parent"
