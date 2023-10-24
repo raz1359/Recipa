@@ -31,8 +31,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -50,7 +53,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
 
     private static final String TAG = "raz";
     public Button button;
-    public ImageView imageView, profilePic;
+    public ImageView backArrow, profilePic;
     public Uri imageUri;
     public EditText fullName, nickname;
     public String uID;
@@ -58,6 +61,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
     FirebaseUser currentUser;
     FirebaseStorage storage;
     StorageReference storageReference;
+    public Profile profile;
 
 
     // Connect to real time database
@@ -67,8 +71,8 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fill_profile);
 
-        imageView = findViewById(R.id.ivbackProfile);
-        imageView.setOnClickListener(this);
+        backArrow = findViewById(R.id.ivbackProfile);
+        backArrow.setOnClickListener(this);
 
         fullName = findViewById(R.id.etfullName);
         fullName.setOnClickListener(this);
@@ -81,64 +85,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         Log.d(TAG, "after");
 
         button = findViewById(R.id.btnContinue);
-
-        final SharedPreferences pref1 = PreferenceManager.getDefaultSharedPreferences(this);
-        final SharedPreferences pref2 = PreferenceManager.getDefaultSharedPreferences(this);
-
-
-        button.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                final String tempName = fullName.getText().toString();
-                final String tempNickname = nickname.getText().toString();
-
-                 datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).child("Fullname").setValue(tempName);
-                 datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).child("Nickname").setValue(tempNickname);
-
-            }
-        });
-
-        fullName.setText(pref1.getString(NameLast_text, ""));
-        fullName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-                pref1.edit().putString(NameLast_text , editable.toString()).commit();
-            }
-
-        });
-
-
-        nickname.setText(pref2.getString(NicknameLast_name, ""));
-        nickname.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-                pref2.edit().putString(NicknameLast_name , editable.toString()).commit();
-            }
-        });
+        button.setOnClickListener(this);
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
@@ -146,7 +93,6 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 choosePicture();
             }
         });
@@ -156,6 +102,29 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         currentUser = mAuth.getCurrentUser();
         uID = currentUser.getUid();
         Log.d(TAG, uID);
+
+        retriveDate();
+    }
+
+    private void retriveDate() {
+        // Retrive fullname
+        datebaseReference.child("users").child(uID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot temp : snapshot.getChildren()) {
+                    if (temp.getKey() == "FullName")
+                        Log.d(TAG, temp.child("Fullname").getValue().toString());
+                    else if (temp.getKey() == "Nickname")
+                        Log.d(TAG, temp.child("Nickname").getValue().toString());
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 
@@ -220,9 +189,21 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
 
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        if (view.getId() == R.id.ivbackProfile) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivityForResult(intent,0);
+        } else {
+            String tempName = fullName.getText().toString();
+            String tempNickname = nickname.getText().toString();
 
+            profile = new Profile(tempName,tempNickname,imageUri.toString());
 
+            datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).setValue(profile);
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivityForResult(intent,0);
+        }
     }
+
 }
