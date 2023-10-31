@@ -1,45 +1,41 @@
 package com.example.myapplication;
 
 public class Profile {
-    
-    public String Fullname;
-    public String Nickname;
-    public String ProfileImage;
 
+    String fullName, nickName, imageUri;
 
-    public Profile() {
-        // Default constructor required for calls to DataSnapshot.getValue(User.class)
+    public Profile(String fullName, String nickName, String imageUri) {
+        this.fullName = fullName;
+        this.nickName = nickName;
+        this.imageUri = imageUri;
     }
 
-    public Profile(String fullname, String nickname, String profileImage) {
-        Fullname = fullname;
-        Nickname = nickname;
-        ProfileImage = profileImage;
+    public Profile(){
+        //Firebse empty constractor
     }
 
-
-    public String getFullname() {
-        return Fullname;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFullname(String fullname) {
-        Fullname = fullname;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public String getNickname() {
-        return Nickname;
+    public String getNickName() {
+        return nickName;
     }
 
-    public void setNickname(String nickname) {
-        Nickname = nickname;
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 
-    public String getProfileImage() {
-        return ProfileImage;
+    public String getImageUri() {
+        return imageUri;
     }
 
-    public void setProfileImage(String profileImage) {
-        ProfileImage = profileImage;
+    public void setImageUri(String imageUri) {
+        this.imageUri = imageUri;
     }
 }
 

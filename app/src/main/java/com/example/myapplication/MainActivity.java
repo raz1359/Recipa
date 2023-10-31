@@ -19,33 +19,48 @@ import android.widget.ImageView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.concurrent.BlockingDeque;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     public Button button;
-    public ImageView imageView, searchImage;
+    public ImageView notificationImage, searchImage,profileImage;
     public EditText searchBar;
     private static final String TAG = "raz";
     private BottomNavigationView bottomNavigationView;
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    FirebaseAuth mAuth;
+    public String uID;
+    FirebaseUser currentUser;
 
-
+    // Connect to real time database
+    DatabaseReference datebaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Firebase initi
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        uID = currentUser.getUid();
 
         searchBar = findViewById(R.id.search_bar);
 
         button = findViewById(R.id.btnSignout);
         button.setOnClickListener(this);
 
-        imageView = findViewById(R.id.notification);
-        imageView.setOnClickListener(this);
+        notificationImage = findViewById(R.id.notification);
+        notificationImage.setOnClickListener(this);
 
-        imageView = findViewById(R.id.emptyProfile);
-        imageView.setOnClickListener(this);
+        profileImage = findViewById(R.id.emptyProfile);
+        profileImage.setOnClickListener(this);
 
         searchImage = findViewById(R.id.searchIcon);
 
@@ -73,8 +88,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
             return false;
+
         });
 
+
+        retriveDate();
 
 
         searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -90,6 +108,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
 
+    }
+
+    private void retriveDate() {
+        datebaseReference.child("users").child(uID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Profile profileTemp = snapshot.getValue(Profile.class);
+
+                if (profileTemp != null) {
+                    String url = profileTemp.getImageUri();
+                    Picasso.get().load(url).resize(250, 250).centerCrop().into(profileImage);
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Override
