@@ -4,18 +4,41 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.android.volley.Cache;
+import com.android.volley.Network;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.BasicNetwork;
+import com.android.volley.toolbox.DiskBasedCache;
+import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class Search extends AppCompatActivity {
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class Search extends AppCompatActivity implements View.OnClickListener {
 
     public ImageView searchImage;
     public EditText searchBar;
+    public TextView changeText;
+    public Button buttonAPI;
+    private static final String TAG = "raz";
     private BottomNavigationView bottomNavigationView;
 
     @Override
@@ -24,6 +47,14 @@ public class Search extends AppCompatActivity {
         setContentView(R.layout.activity_search);
 
         searchImage= findViewById(R.id.searchIcon);
+
+        changeText = findViewById(R.id.textView7);
+
+        buttonAPI = findViewById(R.id.buttonAPI);
+        buttonAPI.setOnClickListener(this);
+
+
+
 
 //        searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 //            @Override
@@ -65,5 +96,48 @@ public class Search extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        if (view.getId() == R.id.buttonAPI) {
+            String url = "https://api.spoonacular.com/recipes/complexSearch?apiKey=9a5a4e3d51fa4468aab3ffa22a94a122&query=chicken&=";
+            Log.d(TAG, "onResponse: ");
+            RequestQueue requestQueue;
+
+            RequestQueue queue = Volley.newRequestQueue(this);
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                    (Request.Method.GET, url,null, new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                JSONArray jsonArray = response.getJSONArray("results");
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                                    String id = jsonObject.getString("id");
+                                    String title = jsonObject.getString("title");
+                                    Log.d(TAG, title);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }, new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // TODO: Handle error
+                            error.printStackTrace();
+                        }
+                    });
+                    queue.add(jsonObjectRequest);
+
+
+     }
     }
 }

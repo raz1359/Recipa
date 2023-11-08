@@ -119,7 +119,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
                     etFullName.setText(profileTemp.fullName);
                     etNickname.setText(profileTemp.getNickName());
                     String url = profileTemp.getImageUri();
-                    Picasso.get().load(url).resize(370, 370).centerCrop().into(profilePic);
+                    Picasso.get().load(url).resize(470, 470).centerCrop().noFade().into(profilePic);
                 }
             }
 

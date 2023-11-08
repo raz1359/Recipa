@@ -52,5 +52,27 @@
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="232dp"
+        android:layout_height="182dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="136dp"
+        android:layout_marginTop="161dp"
+        android:text="Text"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/buttonAPI"
+        android:layout_width="242dp"
+        android:layout_height="216dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="82dp"
+        android:layout_marginTop="372dp"
+        android:text="Button" />
+
 
 </RelativeLayout>

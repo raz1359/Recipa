@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 if (profileTemp != null) {
                     String url = profileTemp.getImageUri();
-                    Picasso.get().load(url).resize(250, 250).centerCrop().into(profileImage);
+                    Picasso.get().load(url).resize(280, 280).centerCrop().noFade().into(profileImage);
 
 
                 }
@@ -157,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Log.d(TAG, "onNavigationItemSelected: " + item.getItemId());
-
 
         return false;
     }

@@ -48,14 +48,16 @@
         android:textColor="#000000"
         />
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/profileImage"
+        android:src="@drawable/profile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tvFillYourProfile"
         android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"
-        app:srcCompat="@drawable/profile" />
+        />
 
 
     <EditText
