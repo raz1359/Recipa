@@ -1,22 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginTop="0dp"
+    android:layout_marginLeft="20dp"
+    android:layout_marginBottom="5dp"
+    android:layout_marginRight="20dp">
     
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/image"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        ></ImageView>
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:scaleType="fitXY"
+        app:shapeAppearanceOverlay="@style/roundImageView"
+        ></com.google.android.material.imageview.ShapeableImageView>
     
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/title"
-        android:textColor="@color/black"
-        android:text="text"
-        android:layout_below="@id/image"
-        android:layout_marginStart="20dp"
-        ></TextView>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/title"
+            android:text="text"
+            android:fontFamily="@font/urbanist_medium"
+            android:textColor="#272727"
+            android:layout_below="@id/image"
+            android:layout_marginLeft="20dp"
+            android:textStyle="bold"
+            ></TextView>
 
 </RelativeLayout>

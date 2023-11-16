@@ -52,7 +52,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
     public static final  String NameLast_text = "" , NicknameLast_name = "";
 
     private static final String TAG = "raz";
-    public Button button;
+    public Button btnContinue, btnSignOut;
     public ImageView backArrow, profilePic;
     public Uri imageUri;
     public EditText etFullName, etNickname;
@@ -62,6 +62,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
     FirebaseStorage storage;
     StorageReference storageReference;
     public Profile profile;
+
 
 
     // Connect to real time database
@@ -84,8 +85,11 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         profilePic.setOnClickListener(this);
         Log.d(TAG, "after");
 
-        button = findViewById(R.id.btnContinue);
-        button.setOnClickListener(this);
+        btnContinue = findViewById(R.id.btnContinue);
+        btnContinue.setOnClickListener(this);
+
+        btnSignOut = findViewById(R.id.btnSignout);
+        btnSignOut.setOnClickListener(this);
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
@@ -94,7 +98,9 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onClick(View view) {
                 choosePicture();
+
             }
+
         });
 
         // Firebase initi
@@ -196,9 +202,16 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
     public void onClick(View view) {
 
         Log.d(TAG, "onClick: " + imageUri.toString());
-
+        Intent intent;
+        if (view.getId() == R.id.btnSignout) {
+            Log.d(TAG, "onClick: ");
+            mAuth.signOut();
+            intent = new Intent(this, login.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivityForResult(intent,0);
+        }
         if (view.getId() == R.id.ivbackProfile) {
-            Intent intent = new Intent(this, MainActivity.class);
+            intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivityForResult(intent,0);
         } else {
@@ -209,10 +222,11 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
             Log.d(TAG, "onClick: " + profile.getFullName() + " " + profile.getNickName() + " " + profile.getImageUri());
 
             datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).setValue(profile);
-            Intent intent = new Intent(this, MainActivity.class);
+            intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivityForResult(intent,0);
         }
+
     }
 
 }

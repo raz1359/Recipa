@@ -86,5 +86,13 @@
         android:layout_marginTop="35dp"
         />
 
+    <Button
+        android:id="@+id/btnSignout"
+        android:layout_width="209dp"
+        android:layout_height="94dp"
+        android:layout_marginTop="500dp"
+        android:layout_centerHorizontal="true"
+        android:text="signout"></Button>
+
 </RelativeLayout>
 

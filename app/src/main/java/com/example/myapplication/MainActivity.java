@@ -3,19 +3,24 @@ package com.example.myapplication;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,9 +32,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.util.concurrent.BlockingDeque;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+
     public Button button;
     public ImageView notificationImage, searchImage,profileImage;
     public EditText searchBar;
@@ -38,6 +49,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     FirebaseAuth mAuth;
     public String uID;
     FirebaseUser currentUser;
+    RecyclerView recyclerView;
+    LinearLayoutManager linearLayoutManager;
+    List<HighRaitingRecipesItem> listHighRating = new ArrayList<HighRaitingRecipesItem>();
+
 
     // Connect to real time database
     DatabaseReference datebaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/");
@@ -53,8 +68,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         searchBar = findViewById(R.id.search_bar);
 
-        button = findViewById(R.id.btnSignout);
-        button.setOnClickListener(this);
 
         notificationImage = findViewById(R.id.notification);
         notificationImage.setOnClickListener(this);
@@ -91,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         });
 
-
         retriveDate();
 
 
@@ -107,6 +119,74 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        recyclerView = findViewById(R.id.recyclViewHighRating);
+        recyclerView.setHasFixedSize(true);
+        linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+
+        getHighRatingRecipeAPI();
+
+
+
+        //createHorizontalRecycleView();
+
+
+
+    }
+
+
+    private void getHighRatingRecipeAPI() {
+
+        String url = "https://api.spoonacular.com/recipes/complexSearch?apiKey=9a5a4e3d51fa4468aab3ffa22a94a122&query=chicken&=";
+        //Log.d(TAG, "onResponse: ");
+        RequestQueue requestQueue;
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url,null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray jsonArray = response.getJSONArray("results");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                                String id = jsonObject.getString("id");
+                                String title = jsonObject.getString("title");
+                                String imageURL = jsonObject.getString("image");
+
+                                HighRaitingRecipesItem tempHightRatingRecipesItem = new HighRaitingRecipesItem(title,imageURL,id);
+                                Log.d(TAG, title);
+                                Log.d(TAG, id);
+                                Log.d(TAG, imageURL);
+
+                                listHighRating.add(tempHightRatingRecipesItem);
+
+                                Log.d(TAG, "onResponse: 11");
+
+                            }
+                            Log.d(TAG, "onResponse: 444" + listHighRating.toString());
+                            recyclerView.setLayoutManager(linearLayoutManager);
+                            recyclerView.setAdapter(new HighRaitingRecipesAdapter(getApplicationContext(),listHighRating));
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO: Handle error
+                        error.printStackTrace();
+                    }
+                });
+
+        queue.add(jsonObjectRequest);
 
     }
 
@@ -135,13 +215,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         Intent intent;
         switch (view.getId()) {
-            case R.id.btnSignout:
-                Log.d(TAG, "onClick: ");
-                mAuth.signOut();
-                intent = new Intent(this, login.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivityForResult(intent,0);
-                break;
             case R.id.notification:
                 intent = new Intent(this, Notification_activity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
