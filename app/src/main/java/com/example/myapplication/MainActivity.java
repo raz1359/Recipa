@@ -2,17 +2,20 @@ package com.example.myapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.android.volley.Request;
@@ -49,9 +52,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     FirebaseAuth mAuth;
     public String uID;
     FirebaseUser currentUser;
-    RecyclerView recyclerView;
-    LinearLayoutManager linearLayoutManager;
+    RecyclerView highRaitingRecyclerView,recommendedRecipesRecyclerView;
+    // creating two linearLayoutManger
+    LinearLayoutManager linearLayoutManagerHorizontal , linearLayoutManagerVertical;
     List<HighRaitingRecipesItem> listHighRating = new ArrayList<HighRaitingRecipesItem>();
+    List<HighRaitingRecipesItem> listRecommendedRecipes = new ArrayList<HighRaitingRecipesItem>();
 
 
     // Connect to real time database
@@ -119,25 +124,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        recyclerView = findViewById(R.id.recyclViewHighRating);
-        recyclerView.setHasFixedSize(true);
-        linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        // HighRaiting RecycleView
+        highRaitingRecyclerView = findViewById(R.id.recyclViewHighRating);
+        highRaitingRecyclerView.setHasFixedSize(true);
+        linearLayoutManagerHorizontal = new LinearLayoutManager(this);
+        linearLayoutManagerHorizontal.setOrientation(LinearLayoutManager.HORIZONTAL);
 
-        getHighRatingRecipeAPI();
+        // RecommendedRecipes RecycleView
+        linearLayoutManagerVertical = new LinearLayoutManager(this);
+        linearLayoutManagerVertical.setOrientation(LinearLayoutManager.VERTICAL);
+        recommendedRecipesRecyclerView = findViewById(R.id.recyclerViewRecommendedRecipes);
+        recommendedRecipesRecyclerView.setHasFixedSize(true);
+        recommendedRecipesRecyclerView.setNestedScrollingEnabled(false);
 
 
-
-        //createHorizontalRecycleView();
-
+         getHighRatingRecipeAPI();
 
 
     }
 
 
+
+
     private void getHighRatingRecipeAPI() {
 
-        String url = "https://api.spoonacular.com/recipes/complexSearch?apiKey=9a5a4e3d51fa4468aab3ffa22a94a122&query=chicken&=";
+        String url = "https://api.spoonacular.com/recipes/complexSearch/?apiKey=9a5a4e3d51fa4468aab3ffa22a94a122&query=bread";
         //Log.d(TAG, "onResponse: ");
         RequestQueue requestQueue;
 
@@ -157,19 +168,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 String title = jsonObject.getString("title");
                                 String imageURL = jsonObject.getString("image");
 
+                                Picasso.get().load(imageURL).resize(500,500).centerCrop().noFade();
+
+
+
                                 HighRaitingRecipesItem tempHightRatingRecipesItem = new HighRaitingRecipesItem(title,imageURL,id);
                                 Log.d(TAG, title);
                                 Log.d(TAG, id);
                                 Log.d(TAG, imageURL);
 
                                 listHighRating.add(tempHightRatingRecipesItem);
+                                listRecommendedRecipes.add(tempHightRatingRecipesItem);
 
                                 Log.d(TAG, "onResponse: 11");
 
                             }
                             Log.d(TAG, "onResponse: 444" + listHighRating.toString());
-                            recyclerView.setLayoutManager(linearLayoutManager);
-                            recyclerView.setAdapter(new HighRaitingRecipesAdapter(getApplicationContext(),listHighRating));
+                            highRaitingRecyclerView.setLayoutManager(linearLayoutManagerHorizontal);
+                            highRaitingRecyclerView.setAdapter(new HighRaitingRecipesAdapter(getApplicationContext(),listHighRating));
+
+                            recommendedRecipesRecyclerView.setLayoutManager(linearLayoutManagerVertical);
+                            recommendedRecipesRecyclerView.setAdapter(new RecommendedRecipesAdapter(getApplicationContext(), listRecommendedRecipes));
 
 
                         } catch (JSONException e) {
