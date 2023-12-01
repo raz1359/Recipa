@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,6 +25,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
@@ -53,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public String uID;
     FirebaseUser currentUser;
     RecyclerView highRaitingRecyclerView,recommendedRecipesRecyclerView;
+    ImageButton ibHeart;
+
     // creating two linearLayoutManger
     LinearLayoutManager linearLayoutManagerHorizontal , linearLayoutManagerVertical;
     List<HighRaitingRecipesItem> listHighRating = new ArrayList<HighRaitingRecipesItem>();
@@ -61,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Connect to real time database
     DatabaseReference datebaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,11 +75,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Firebase initi
         mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
-        uID = currentUser.getUid();
+        currentUser = mAuth.getCurrentUser(); //get current user
+        uID = currentUser.getUid(); // get current user unique ID
 
         searchBar = findViewById(R.id.search_bar);
-
 
         notificationImage = findViewById(R.id.notification);
         notificationImage.setOnClickListener(this);
@@ -84,6 +90,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         bottomNavigationView = findViewById(R.id.bottomNavBar);
         bottomNavigationView.setSelectedItemId(R.id.homeBT);
+
+
+        // HighRaiting RecycleView
+        highRaitingRecyclerView = findViewById(R.id.recyclViewHighRating);
+        highRaitingRecyclerView.setHasFixedSize(true);
+        linearLayoutManagerHorizontal = new LinearLayoutManager(this);
+        linearLayoutManagerHorizontal.setOrientation(LinearLayoutManager.HORIZONTAL);
+
+        // RecommendedRecipes RecycleView
+        linearLayoutManagerVertical = new LinearLayoutManager(this);
+        linearLayoutManagerVertical.setOrientation(LinearLayoutManager.VERTICAL);
+        recommendedRecipesRecyclerView = findViewById(R.id.recyclerViewRecommendedRecipes);
+        recommendedRecipesRecyclerView.setHasFixedSize(true);
+        recommendedRecipesRecyclerView.setNestedScrollingEnabled(false);
+
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()){
@@ -109,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         });
 
-        retriveDate();
+        retrieveData();
 
 
         searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -123,20 +144,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
-
-        // HighRaiting RecycleView
-        highRaitingRecyclerView = findViewById(R.id.recyclViewHighRating);
-        highRaitingRecyclerView.setHasFixedSize(true);
-        linearLayoutManagerHorizontal = new LinearLayoutManager(this);
-        linearLayoutManagerHorizontal.setOrientation(LinearLayoutManager.HORIZONTAL);
-
-        // RecommendedRecipes RecycleView
-        linearLayoutManagerVertical = new LinearLayoutManager(this);
-        linearLayoutManagerVertical.setOrientation(LinearLayoutManager.VERTICAL);
-        recommendedRecipesRecyclerView = findViewById(R.id.recyclerViewRecommendedRecipes);
-        recommendedRecipesRecyclerView.setHasFixedSize(true);
-        recommendedRecipesRecyclerView.setNestedScrollingEnabled(false);
-
 
          getHighRatingRecipeAPI();
 
@@ -154,62 +161,75 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url,null, new Response.Listener<JSONObject>() {
-
+        datebaseReference.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("favourites").get()
+                .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray jsonArray = response.getJSONArray("results");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        List<String> favourites = Arrays.asList(task.getResult().getValue().toString().split(","));
 
-                                String id = jsonObject.getString("id");
-                                String title = jsonObject.getString("title");
-                                String imageURL = jsonObject.getString("image");
+                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                                (Request.Method.GET, url,null, new Response.Listener<JSONObject>() {
 
-                                Picasso.get().load(imageURL).resize(500,500).centerCrop().noFade();
+                                    @Override
+                                    public void onResponse(JSONObject response) {
+                                        try {
+                                            JSONArray jsonArray = response.getJSONArray("results");
+                                            for (int i = 0; i < jsonArray.length(); i++) {
+                                                JSONObject jsonObject = jsonArray.getJSONObject(i);
 
+                                                String id = jsonObject.getString("id");
+                                                String title = jsonObject.getString("title");
+                                                String imageURL = jsonObject.getString("image");
 
+                                                boolean isFavourite = false;
+                                                if (favourites.contains(id)) isFavourite = true;
 
-                                HighRaitingRecipesItem tempHightRatingRecipesItem = new HighRaitingRecipesItem(title,imageURL,id);
-                                Log.d(TAG, title);
-                                Log.d(TAG, id);
-                                Log.d(TAG, imageURL);
-
-                                listHighRating.add(tempHightRatingRecipesItem);
-                                listRecommendedRecipes.add(tempHightRatingRecipesItem);
-
-                                Log.d(TAG, "onResponse: 11");
-
-                            }
-                            Log.d(TAG, "onResponse: 444" + listHighRating.toString());
-                            highRaitingRecyclerView.setLayoutManager(linearLayoutManagerHorizontal);
-                            highRaitingRecyclerView.setAdapter(new HighRaitingRecipesAdapter(getApplicationContext(),listHighRating));
-
-                            recommendedRecipesRecyclerView.setLayoutManager(linearLayoutManagerVertical);
-                            recommendedRecipesRecyclerView.setAdapter(new RecommendedRecipesAdapter(getApplicationContext(), listRecommendedRecipes));
+                                                Picasso.get().load(imageURL).resize(500,500).centerCrop().noFade();
 
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
 
-                    }
-                }, new Response.ErrorListener() {
+                                                HighRaitingRecipesItem tempHightRatingRecipesItem = new HighRaitingRecipesItem(title,imageURL,id, isFavourite);
+                                                Log.d(TAG, title);
+                                                Log.d(TAG, id);
+                                                Log.d(TAG, imageURL);
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                        error.printStackTrace();
+                                                listHighRating.add(tempHightRatingRecipesItem);
+                                                listRecommendedRecipes.add(tempHightRatingRecipesItem);
+
+                                                Log.d(TAG, "onResponse: 11");
+
+                                            }
+                                            Log.d(TAG, "onResponse: 444" + listHighRating.toString());
+                                            highRaitingRecyclerView.setLayoutManager(linearLayoutManagerHorizontal);
+                                            highRaitingRecyclerView.setAdapter(new HighRaitingRecipesAdapter(getApplicationContext(),listHighRating));
+
+                                            recommendedRecipesRecyclerView.setLayoutManager(linearLayoutManagerVertical);
+                                            recommendedRecipesRecyclerView.setAdapter(new RecommendedRecipesAdapter(getApplicationContext(), listRecommendedRecipes));
+
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    }
+                                }, new Response.ErrorListener() {
+
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        // TODO: Handle error
+                                        error.printStackTrace();
+                                    }
+                                });
+
+                        queue.add(jsonObjectRequest);
                     }
                 });
 
-        queue.add(jsonObjectRequest);
 
     }
 
-    private void retriveDate() {
+    private void retrieveData() {
         datebaseReference.child("users").child(uID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

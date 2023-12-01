@@ -2,12 +2,21 @@ package com.example.myapplication;
 
 public class Profile {
 
-    String fullName, nickName, imageUri;
+    String fullName, nickName, imageUri, favourites;
 
-    public Profile(String fullName, String nickName, String imageUri) {
+    public Profile(String fullName, String nickName, String imageUri, String favourites) {
         this.fullName = fullName;
         this.nickName = nickName;
         this.imageUri = imageUri;
+        this.favourites = favourites;
+    }
+
+    public String getFavourites() {
+        return favourites;
+    }
+
+    public void setFavourites(String favourites) {
+        this.favourites = favourites;
     }
 
     public Profile(){

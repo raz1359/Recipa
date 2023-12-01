@@ -5,16 +5,25 @@ import android.graphics.Bitmap;
 public class HighRaitingRecipesItem {
 
     String name,image,id;
-
+    boolean isFavourite;
 
     public HighRaitingRecipesItem() {
         // firebase
     }
 
-    public HighRaitingRecipesItem(String name, String image, String id) {
+    public HighRaitingRecipesItem(String name, String image, String id, boolean isFavourite) {
         this.name = name;
         this.id = id;
         this.image = image;
+        this.isFavourite = isFavourite;
+    }
+
+    public boolean isFavourite() {
+        return isFavourite;
+    }
+
+    public void setFavourite(boolean favourite) {
+        isFavourite = favourite;
     }
 
     public String getName() {

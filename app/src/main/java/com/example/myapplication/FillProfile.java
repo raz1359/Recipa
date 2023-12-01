@@ -1,29 +1,22 @@
 package com.example.myapplication;
 
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.provider.MediaStore;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -42,10 +35,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-import java.util.HashMap;
+
 import java.util.UUID;
-import java.util.prefs.Preferences;
 
 public class FillProfile extends AppCompatActivity implements View.OnClickListener {
 
@@ -62,6 +53,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
     FirebaseStorage storage;
     StorageReference storageReference;
     public Profile profile;
+    ActivityResultLauncher<String> arlGallery;
 
 
 
@@ -94,10 +86,24 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
+        arlGallery = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
+            @Override
+            public void onActivityResult(Uri result) {
+                if (result != null) {
+                    Log.d(TAG, "onActivityResult: I am back from Gallary");
+                    imageUri = result;
+                    Picasso.get().load(result).resize(470, 470).centerCrop().noFade().into(profilePic);
+                    uploadPicture();
+                }
+
+            }
+        });
+
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 choosePicture();
+                arlGallery.launch("image/*");
 
             }
 
@@ -110,11 +116,11 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         Log.d(TAG, uID);
 
 
-        retriveDate();
+        retrieveDate();
     }
 
-    private void retriveDate() {
-        // Retrive fullname, Nickname, Profile Image
+    private void retrieveDate() {
+        // Retrieve FullName, Nickname, Profile Image
         datebaseReference.child("users").child(uID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -129,7 +135,6 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
                 }
             }
 
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -142,17 +147,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent,1);
-    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null){
-            imageUri = data.getData();
-            profilePic.setImageURI(imageUri);
-            uploadPicture();
-        }
     }
 
     private void uploadPicture() {
@@ -218,7 +213,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
             String tempName = etFullName.getText().toString();
             String tempNickname = etNickname.getText().toString();
 
-            profile = new Profile(tempName,tempNickname,imageUri.toString());
+            profile = new Profile(tempName,tempNickname,imageUri.toString(), "");
             Log.d(TAG, "onClick: " + profile.getFullName() + " " + profile.getNickName() + " " + profile.getImageUri());
 
             datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).setValue(profile);

@@ -39,17 +39,15 @@
         android:background="@drawable/corner">
     </Button>
 
-    <ImageButton
+    <ImageView
         android:id="@+id/ibHeart"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@drawable/heart_not_clicked"
+        android:backgroundTint="@android:color/transparent"
         android:clickable="true"
         android:layout_marginLeft="315dp"
         android:layout_marginTop="90dp"
         android:elevation="2dp"/>
-
-
-
 
 </RelativeLayout>
