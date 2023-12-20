@@ -125,7 +125,7 @@ public class FragmentLogin1 extends Fragment implements View.OnClickListener {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Intent intent = new Intent(currentContext,MainActivity.class);
+                            Intent intent = new Intent(currentContext,FillProfile.class);
                             startActivity(intent);
                         } else {
                             try {

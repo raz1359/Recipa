@@ -33,8 +33,9 @@ public class login extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_login);
+        Log.d(TAG, "onCreate: login 111");
+        
         fragment1bt = findViewById(R.id.fragment1btn);
         fragment2btn = findViewById(R.id.fragment2btn);
 
@@ -61,7 +62,6 @@ public class login extends AppCompatActivity {
                 signUp.setTextColor(Color.parseColor("#1BAC4B"));
 
 
-
             }
         });
 
@@ -85,10 +85,10 @@ public class login extends AppCompatActivity {
         });
     }
 
-
     @Override
     public void onStart() {
         super.onStart();
+        Log.d(TAG, "onStart: ");
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){

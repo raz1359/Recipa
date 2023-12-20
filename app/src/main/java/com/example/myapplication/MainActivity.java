@@ -49,7 +49,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     public Button button;
-    public ImageView notificationImage, searchImage,profileImage;
+    public ImageView notificationImage, searchImage,profileImage, favoritesImage;
     public EditText searchBar;
     private static final String TAG = "raz";
     private BottomNavigationView bottomNavigationView;
@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     LinearLayoutManager linearLayoutManagerHorizontal , linearLayoutManagerVertical;
     List<HighRaitingRecipesItem> listHighRating = new ArrayList<HighRaitingRecipesItem>();
     List<HighRaitingRecipesItem> listRecommendedRecipes = new ArrayList<HighRaitingRecipesItem>();
+
+    List<String> favourites = new ArrayList<>();
 
 
     // Connect to real time database
@@ -82,6 +84,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         notificationImage = findViewById(R.id.notification);
         notificationImage.setOnClickListener(this);
+
+        favoritesImage = findViewById(R.id.favorite_icon);
+        favoritesImage.setOnClickListener(this);
 
         profileImage = findViewById(R.id.emptyProfile);
         profileImage.setOnClickListener(this);
@@ -157,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         String url = "https://api.spoonacular.com/recipes/complexSearch/?apiKey=9a5a4e3d51fa4468aab3ffa22a94a122&query=bread";
         //Log.d(TAG, "onResponse: ");
-        RequestQueue requestQueue;
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -166,63 +170,84 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DataSnapshot> task) {
-                        List<String> favourites = Arrays.asList(task.getResult().getValue().toString().split(","));
 
-                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                                (Request.Method.GET, url,null, new Response.Listener<JSONObject>() {
+                        //checking if favourites list is null
+                        if (task.getResult().getValue() != null) {
+                            favourites = Arrays.asList(task.getResult().getValue().toString().split(","));
+                            Log.d(TAG, "onComplete: " + favourites.toString());
+                        }
+                            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                                    (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
-                                    @Override
-                                    public void onResponse(JSONObject response) {
-                                        try {
-                                            JSONArray jsonArray = response.getJSONArray("results");
-                                            for (int i = 0; i < jsonArray.length(); i++) {
-                                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                        @Override
+                                        public void onResponse(JSONObject response) {
+                                            try {
+                                                JSONArray jsonArray = response.getJSONArray("results");
+                                                for (int i = 0; i < jsonArray.length(); i++) {
+                                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                                                String id = jsonObject.getString("id");
-                                                String title = jsonObject.getString("title");
-                                                String imageURL = jsonObject.getString("image");
-
-                                                boolean isFavourite = false;
-                                                if (favourites.contains(id)) isFavourite = true;
-
-                                                Picasso.get().load(imageURL).resize(500,500).centerCrop().noFade();
-
+                                                    String id = jsonObject.getString("id");
+                                                    String title = jsonObject.getString("title");
+                                                    String imageURL = jsonObject.getString("image");
 
 
-                                                HighRaitingRecipesItem tempHightRatingRecipesItem = new HighRaitingRecipesItem(title,imageURL,id, isFavourite);
-                                                Log.d(TAG, title);
-                                                Log.d(TAG, id);
-                                                Log.d(TAG, imageURL);
+                                                    boolean isFavourite = false;
 
-                                                listHighRating.add(tempHightRatingRecipesItem);
-                                                listRecommendedRecipes.add(tempHightRatingRecipesItem);
+                                                    // if (favourites.contains(id)) isFavourite = true;
 
-                                                Log.d(TAG, "onResponse: 11");
+                                                    Picasso.get().load(imageURL).resize(500, 500).centerCrop().noFade();
 
+
+                                                    HighRaitingRecipesItem tempHightRatingRecipesItem = new HighRaitingRecipesItem(title, imageURL, id, isFavourite);
+                                                    Log.d(TAG, title);
+                                                    Log.d(TAG, id);
+                                                    Log.d(TAG, imageURL);
+
+                                                    listHighRating.add(tempHightRatingRecipesItem);
+                                                    listRecommendedRecipes.add(tempHightRatingRecipesItem);
+                                                    Log.d(TAG, "onResponse: " + listRecommendedRecipes);
+                                                    //compare ids and checking that favorits are on the recomended list
+
+                                                    for (int j = 0; j < listRecommendedRecipes.size(); j++) {
+                                                        for (int x = 0; x < favourites.size(); x++) {
+                                                            if (listRecommendedRecipes.get(j).getId().equals(favourites.get(x))) {
+                                                                Log.d(TAG, "onResponse: 5656565");
+                                                                listRecommendedRecipes.get(j).setFavourite(true);
+                                                            }
+                                                        }
+                                                        Log.d(TAG, "onResponse: " + listRecommendedRecipes.get(j).toString());
+                                                    }
+
+                                                    String temp = String.valueOf(listRecommendedRecipes.get(0).isFavourite() + " " + listRecommendedRecipes.get(0).getId());
+                                                    Log.d(TAG, temp);
+
+
+                                                    Log.d(TAG, "onResponse: 11");
+
+                                                }
+                                                Log.d(TAG, "onResponse: 444" + listHighRating.toString());
+                                                highRaitingRecyclerView.setLayoutManager(linearLayoutManagerHorizontal);
+                                                highRaitingRecyclerView.setAdapter(new HighRaitingRecipesAdapter(getApplicationContext(), listHighRating));
+
+                                                recommendedRecipesRecyclerView.setLayoutManager(linearLayoutManagerVertical);
+                                                recommendedRecipesRecyclerView.setAdapter(new RecommendedRecipesAdapter(getApplicationContext(), listRecommendedRecipes));
+
+
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
                                             }
-                                            Log.d(TAG, "onResponse: 444" + listHighRating.toString());
-                                            highRaitingRecyclerView.setLayoutManager(linearLayoutManagerHorizontal);
-                                            highRaitingRecyclerView.setAdapter(new HighRaitingRecipesAdapter(getApplicationContext(),listHighRating));
 
-                                            recommendedRecipesRecyclerView.setLayoutManager(linearLayoutManagerVertical);
-                                            recommendedRecipesRecyclerView.setAdapter(new RecommendedRecipesAdapter(getApplicationContext(), listRecommendedRecipes));
-
-
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
                                         }
+                                    }, new Response.ErrorListener() {
 
-                                    }
-                                }, new Response.ErrorListener() {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error) {
+                                            // TODO: Handle error
+                                            error.printStackTrace();
+                                        }
+                                    });
 
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        // TODO: Handle error
-                                        error.printStackTrace();
-                                    }
-                                });
-
-                        queue.add(jsonObjectRequest);
+                            queue.add(jsonObjectRequest);
                     }
                 });
 
@@ -256,6 +281,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()) {
             case R.id.notification:
                 intent = new Intent(this, Notification_activity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivityForResult(intent,0);
+                break;
+            case R.id.favorite_icon:
+                intent = new Intent(this, Favorite  .class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivityForResult(intent,0);
                 break;

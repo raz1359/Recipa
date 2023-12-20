@@ -1,11 +1,10 @@
+// Import statements
 package com.example.myapplication;
-
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
@@ -40,14 +39,13 @@ import java.util.UUID;
 
 public class FillProfile extends AppCompatActivity implements View.OnClickListener {
 
-    public static final  String NameLast_text = "" , NicknameLast_name = "";
-
+    // Declare UI elements
     private static final String TAG = "raz";
     public Button btnContinue, btnSignOut;
     public ImageView backArrow, profilePic;
     public Uri imageUri;
     public EditText etFullName, etNickname;
-    public String uID;
+    public String uID, url;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
     FirebaseStorage storage;
@@ -86,11 +84,12 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
+        // Set up ActivityResultLauncher for gallery
         arlGallery = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
             @Override
             public void onActivityResult(Uri result) {
                 if (result != null) {
-                    Log.d(TAG, "onActivityResult: I am back from Gallary");
+                    Log.d(TAG, "onActivityResult: I am back from Gallery");
                     imageUri = result;
                     Picasso.get().load(result).resize(470, 470).centerCrop().noFade().into(profilePic);
                     uploadPicture();
@@ -99,6 +98,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
             }
         });
 
+        // Set onClickListener for profile picture selection
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -109,13 +109,13 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
 
         });
 
-        // Firebase initi
+        //Initialize Firebase
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         uID = currentUser.getUid();
         Log.d(TAG, uID);
 
-
+        // Retrieve data from Firebase
         retrieveDate();
     }
 
@@ -126,11 +126,15 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Profile profileTemp = snapshot.getValue(Profile.class);
 
-                if (profileTemp != null) {
-                    Log.d(TAG, "onDataChange: " + profileTemp.getNickName() + " " + profileTemp.getFullName() + " " + profileTemp.getImageUri());
-                    etFullName.setText(profileTemp.fullName);
+                if (profileTemp != null && profileTemp.getImageUri() != null) {
+                    Log.d(TAG, "onDataChange: capcap " + profileTemp.getNickName()
+                            + " " + profileTemp.getFullName() + " " + profileTemp.getImageUri());
+
+                    //set EditText values
+                    etFullName.setText(profileTemp.getFullName());
                     etNickname.setText(profileTemp.getNickName());
-                    String url = profileTemp.getImageUri();
+                    url = profileTemp.getImageUri();
+
                     Picasso.get().load(url).resize(470, 470).centerCrop().noFade().into(profilePic);
                 }
             }
@@ -172,6 +176,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
                                 imageUri = uri;
                                 Log.d(TAG, "onSuccess: download uri: = " + uri.toString());
                                 Picasso.get().load(uri).resize(370,370).centerCrop().into(profilePic);
+                                url = imageUri.toString();
                                 datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).child("ProfileImage").setValue(uri.toString());
                             }
                         });
@@ -193,19 +198,19 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
                 });
     }
 
+
     @Override
     public void onClick(View view) {
 
-        Log.d(TAG, "onClick: " + imageUri.toString());
+        //Log.d(TAG, "onClick: " + imageUri.toString());
         Intent intent;
         if (view.getId() == R.id.btnSignout) {
-            Log.d(TAG, "onClick: ");
             mAuth.signOut();
+
             intent = new Intent(this, login.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivityForResult(intent,0);
-        }
-        if (view.getId() == R.id.ivbackProfile) {
+            startActivity(intent);
+            finish();
+        } else if (view.getId() == R.id.ivbackProfile) {
             intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivityForResult(intent,0);
@@ -213,15 +218,17 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
             String tempName = etFullName.getText().toString();
             String tempNickname = etNickname.getText().toString();
 
-            profile = new Profile(tempName,tempNickname,imageUri.toString(), "");
-            Log.d(TAG, "onClick: " + profile.getFullName() + " " + profile.getNickName() + " " + profile.getImageUri());
+            profile = new Profile(tempName, tempNickname, url, "");
+            Log.d(TAG, "Get name and nickname: " + profile.getFullName()
+                    + " " + profile.getNickName() + " " + profile.getImageUri());
+            Log.d(TAG, "upload profile" + profile.toString());
 
             datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).setValue(profile);
             intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivityForResult(intent,0);
-        }
+            startActivityForResult(intent, 0);
 
+        }
     }
 
 }

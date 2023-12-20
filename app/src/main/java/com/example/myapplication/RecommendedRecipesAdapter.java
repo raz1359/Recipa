@@ -50,6 +50,9 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
         Picasso.get().load(highRaitingRecipesItem.getImage()).resize(500,500).centerCrop().into(holder.imageView1);
         Log.d(TAG, "onBindViewHolder: in adapter holder");
 
+        if (list.get(position).isFavourite == true)
+            holder.likeBtn.setImageResource(R.drawable.heart_clicked);
+
         holder.likeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

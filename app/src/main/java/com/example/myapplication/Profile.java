@@ -20,7 +20,7 @@ public class Profile {
     }
 
     public Profile(){
-        //Firebse empty constractor
+        //Firebase empty constractor
     }
 
     public String getFullName() {

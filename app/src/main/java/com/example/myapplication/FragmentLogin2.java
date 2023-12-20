@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -43,6 +44,10 @@ public class FragmentLogin2 extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_login2, container, false);
+
+        // Initialize FirebaseAuth
+        mAuth = FirebaseAuth.getInstance();
+
         return view;
     }
 
@@ -79,9 +84,13 @@ public class FragmentLogin2 extends Fragment implements View.OnClickListener {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            Intent intent = new Intent(getContext(), MainActivity.class);
+                            startActivity(intent);
 
                         } else {
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
+                            Log.w(TAG,  "signInWithEmail:failure", task.getException());
+                            Toast.makeText(currentContext, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
                         }
                     }
 

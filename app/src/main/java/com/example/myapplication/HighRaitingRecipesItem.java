@@ -49,6 +49,12 @@ public class HighRaitingRecipesItem {
     public void setId(String id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+
+        return image+" "+name+" "+id + isFavourite;
+    }
 }
 
 
