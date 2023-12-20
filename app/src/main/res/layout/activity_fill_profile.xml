@@ -31,7 +31,7 @@
         android:layout_width="29dp"
         android:layout_height="15dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="46dp"
+        android:layout_marginTop="43dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/arrow" />
@@ -45,8 +45,7 @@
         android:layout_toEndOf="@+id/ivbackProfile"
         android:fontFamily="@font/urbanist_medium"
         android:text="Fill Your Profile"
-        android:textColor="#000000"
-        />
+        android:textColor="#000000" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -86,13 +85,17 @@
         android:layout_marginTop="35dp"
         />
 
-    <Button
+    <ImageButton
         android:id="@+id/btnSignout"
-        android:layout_width="209dp"
-        android:layout_height="94dp"
-        android:layout_marginTop="500dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/tvFillYourProfile"
+        android:layout_marginStart="190dp"
+        android:layout_marginTop="32dp"
         android:layout_centerHorizontal="true"
-        android:text="signout"></Button>
+        android:src="@drawable/signout"
+        android:background="@null"
+        android:text="signout"></ImageButton>
 
 </RelativeLayout>
 

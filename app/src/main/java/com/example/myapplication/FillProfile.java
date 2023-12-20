@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -41,7 +42,8 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
 
     // Declare UI elements
     private static final String TAG = "raz";
-    public Button btnContinue, btnSignOut;
+     Button btnContinue;
+    ImageButton btnSignOut;
     public ImageView backArrow, profilePic;
     public Uri imageUri;
     public EditText etFullName, etNickname;
@@ -202,7 +204,6 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
 
-        //Log.d(TAG, "onClick: " + imageUri.toString());
         Intent intent;
         if (view.getId() == R.id.btnSignout) {
             mAuth.signOut();
