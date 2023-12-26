@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,14 +64,20 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
                     holder.likeBtn.setImageResource(R.drawable.heart_clicked);
                     addFavourite(position);
                 }
-                Toast.makeText(holder.itemView.getContext(), "Like btn clicked, position: " + position, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(holder.itemView.getContext(), "Like btn clicked, position: " + position, Toast.LENGTH_SHORT).show();
             }
         });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(holder.itemView.getContext(), "Item view clicked, position: " + position, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(holder.itemView.getContext(), RecipePageActivity.class);
+
+                Log.d(TAG, "onClick id: " + list.get(position).getId());
+                intent.putExtra("id", list.get(position).getId());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                holder.itemView.getContext().startActivity(intent);
+
             }
         });
     }
@@ -118,9 +125,11 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
     private String buildFavsString(){
         String favouritesStr = "";
         for (HighRaitingRecipesItem item : list){
-            if (item.isFavourite){
-                if (favouritesStr.isEmpty()) favouritesStr=item.id;
-                else favouritesStr+=","+item.id;
+            if (item.isFavourite) {
+
+                if (favouritesStr.isEmpty()) favouritesStr = item.id;
+
+                else favouritesStr += "," + item.id;
             }
         }
         return favouritesStr;

@@ -155,13 +155,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-
-
-
     private void getHighRatingRecipeAPI() {
 
-        String url = "https://api.spoonacular.com/recipes/complexSearch/?apiKey=9a5a4e3d51fa4468aab3ffa22a94a122&query=bread";
-        //Log.d(TAG, "onResponse: ");
+        String url = "https://api.spoonacular.com/recipes/random?number=5&apiKey=9a5a4e3d51fa4468aab3ffa22a94a122";
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -182,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         @Override
                                         public void onResponse(JSONObject response) {
                                             try {
-                                                JSONArray jsonArray = response.getJSONArray("results");
+                                                JSONArray jsonArray = response.getJSONArray("recipes");
                                                 for (int i = 0; i < jsonArray.length(); i++) {
                                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -198,16 +194,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                     Picasso.get().load(imageURL).resize(500, 500).centerCrop().noFade();
 
 
-                                                    HighRaitingRecipesItem tempHightRatingRecipesItem = new HighRaitingRecipesItem(title, imageURL, id, isFavourite);
+                                                    HighRaitingRecipesItem tempHighRatingRecipesItem = new HighRaitingRecipesItem(title, imageURL, id, isFavourite);
                                                     Log.d(TAG, title);
                                                     Log.d(TAG, id);
                                                     Log.d(TAG, imageURL);
 
-                                                    listHighRating.add(tempHightRatingRecipesItem);
-                                                    listRecommendedRecipes.add(tempHightRatingRecipesItem);
+                                                    listHighRating.add(tempHighRatingRecipesItem);
+                                                    listRecommendedRecipes.add(tempHighRatingRecipesItem);
                                                     Log.d(TAG, "onResponse: " + listRecommendedRecipes);
-                                                    //compare ids and checking that favorits are on the recomended list
 
+                                                    //compare ids and checking that favorits are on the recommended list
                                                     for (int j = 0; j < listRecommendedRecipes.size(); j++) {
                                                         for (int x = 0; x < favourites.size(); x++) {
                                                             if (listRecommendedRecipes.get(j).getId().equals(favourites.get(x))) {

@@ -11,6 +11,7 @@
         android:layout_height="15dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="46dp"
+        android:clickable="true"
         app:srcCompat="@drawable/arrow"/>
     
 
@@ -23,38 +24,52 @@
         android:layout_marginTop="30dp"
         app:srcCompat="@drawable/favorites_icon" />
 
+    <ImageView
+        android:id="@+id/shopping_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@id/ivBack"
+        android:layout_marginLeft="250dp"
+        android:layout_marginTop="30dp"
+        android:clickable="true"
+        android:src="@drawable/shoping_cart_logo"/>
+
+
     <TextView
         android:id="@+id/tvRecipeName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/favorite_icon"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
         android:layout_marginStart="20dp"
         android:text="Name"
         android:layout_centerHorizontal="true"
         android:textSize="22dp"
         android:textStyle="bold"
-        android:fontFamily="@font/urbanist_medium"
+        android:fontFamily="@font/urbanist_light"
         android:textColor="#272727"
+        android:textAlignment="center"
         ></TextView>
 
     <ImageView
+        android:id="@+id/recipe_iv"
         android:layout_width="330dp"
         android:layout_height="300dp"
         android:background="@color/gray"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="20dp"
         android:layout_below="@id/tvRecipeName"
         android:layout_centerHorizontal="true"/>
 
     <ImageButton
         android:id="@+id/ibHeart"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
+        android:layout_width="50dp"
+        android:scaleType="fitXY"
+        android:layout_height="50dp"
         android:src="@drawable/heart_not_clicked"
         android:clickable="true"
         android:background="@null"
-        android:layout_marginLeft="280dp"
-        android:layout_marginTop="340dp"
+        android:layout_marginLeft="315dp"
+        android:layout_marginTop="365dp"
         android:elevation="2dp"/>
 
     <TextView
@@ -63,23 +78,25 @@
         android:layout_height="35dp"
         android:text="description"
         android:paddingLeft="60dp"
+        android:fontFamily="@font/opensans_regular"
         android:textAllCaps="true"
         android:paddingVertical="3dp"
         android:layout_below="@id/ibHeart"
-        android:layout_marginBottom="70dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="30dp"
         android:textColor="#494949"
         android:background="@drawable/circle"
         android:textSize="20dp"
         android:layout_marginStart="-25dp"/>
 
     <TextView
+        android:id="@+id/desc_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/description"
+        android:layout_below="@id/ibHeart"
+        android:layout_marginTop="84dp"
+        android:textAlignment="textStart"
         android:text="asdasdasdas asda asd"
         android:paddingHorizontal="13dp"
-        android:gravity="right"
         />
 
 

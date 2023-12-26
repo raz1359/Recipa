@@ -54,7 +54,6 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.8'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0'
 
-
     // Import the BoM for the Firebase platform
     implementation platform('com.google.firebase:firebase-bom:31.1.1')
 
@@ -63,4 +62,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth'
 
 
+    implementation 'org.jsoup:jsoup:1.17.1'
 }
