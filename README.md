@@ -1,3 +1,5 @@
+
+```markdown
 # Recipe Discovery App
 
 Welcome to the Recipe Discovery App! This application helps users find and organize recipes based on their preferences, dietary needs, and available ingredients.
@@ -13,3 +15,32 @@ Welcome to the Recipe Discovery App! This application helps users find and organ
 1. **Clone the Repository:**
    ```bash
    git clone https://github.com/your-username/recipe-discovery-app.git
+   ```
+
+2. **Install Dependencies:**
+   ```bash
+   cd recipe-discovery-app
+   # Add instructions to install dependencies if any
+   ```
+
+3. **Run the App:**
+   ```bash
+   # Add instructions to run the app locally
+   ```
+
+## Contributing
+
+Contributions are welcome! If you'd like to contribute, please follow our [Contribution Guidelines](CONTRIBUTING.md).
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+## Acknowledgments
+
+- Mention any third-party libraries or resources used.
+
+Happy cooking!
+```
+
+Make sure to replace placeholder values such as `your-username` with your actual GitHub username. 
