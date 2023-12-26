@@ -1,5 +1,4 @@
 
-```markdown
 # Recipe Discovery App
 
 Welcome to the Recipe Discovery App! This application helps users find and organize recipes based on their preferences, dietary needs, and available ingredients.
