@@ -61,7 +61,7 @@
         android:layout_centerHorizontal="true"/>
 
     <ImageButton
-        android:id="@+id/ibHeart"
+        android:id="@+id/ibHeartRecipe"
         android:layout_width="50dp"
         android:scaleType="fitXY"
         android:layout_height="50dp"
@@ -81,18 +81,30 @@
         android:fontFamily="@font/opensans_regular"
         android:textAllCaps="true"
         android:paddingVertical="3dp"
-        android:layout_below="@id/ibHeart"
+        android:layout_below="@id/ibHeartRecipe"
         android:layout_marginTop="30dp"
         android:textColor="#494949"
         android:background="@drawable/circle"
         android:textSize="20dp"
         android:layout_marginStart="-25dp"/>
 
+    <ImageButton
+        android:id="@+id/textToSpeech"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:src="@drawable/text_to_speech"
+        android:clickable="true"
+        android:scaleType="fitXY"
+        android:background="@null"
+        android:layout_alignTop="@id/description"
+        android:layout_marginLeft="320dp"/>
+
+
     <TextView
         android:id="@+id/desc_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ibHeart"
+        android:layout_below="@id/ibHeartRecipe"
         android:layout_marginTop="84dp"
         android:textAlignment="textStart"
         android:text="asdasdasdas asda asd"

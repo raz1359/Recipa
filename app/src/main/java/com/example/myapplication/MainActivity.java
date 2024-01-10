@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -44,7 +45,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
@@ -151,13 +154,114 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
          getHighRatingRecipeAPI();
+         getRecommendedRecipeAPI();
+
+
+    }
+
+    private void getRecommendedRecipeAPI() {
+
+        String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?number=5";
+
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        datebaseReference.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("favourites").get()
+                .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+
+                        //checking if favourites list is null
+                        if (task.getResult().getValue() != null) {
+                            favourites = Arrays.asList(task.getResult().getValue().toString().split(","));
+                            Log.d(TAG, "onComplete: " + favourites.toString());
+                        }
+                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                                    @Override
+                                    public void onResponse(JSONObject response) {
+                                        try {
+                                            JSONArray jsonArray = response.getJSONArray("recipes");
+                                            for (int i = 0; i < jsonArray.length(); i++) {
+                                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                                                String id = jsonObject.getString("id");
+                                                String title = jsonObject.getString("title");
+                                                String imageURL = jsonObject.getString("image");
+
+
+                                                boolean isFavourite = false;
+
+                                                // if (favourites.contains(id)) isFavourite = true;
+
+                                                Picasso.get().load(imageURL).resize(500, 500).centerCrop().noFade();
+
+
+                                                HighRaitingRecipesItem tempHighRatingRecipesItem = new HighRaitingRecipesItem(title, imageURL, id, isFavourite);
+                                                Log.d(TAG, title);
+                                                Log.d(TAG, id);
+                                                Log.d(TAG, imageURL);
+
+                                                listRecommendedRecipes.add(tempHighRatingRecipesItem);
+                                                Log.d(TAG, "onResponse: " + listRecommendedRecipes);
+
+                                                //compare ids and checking that favorits are on the recommended list
+                                                for (int j = 0; j < listRecommendedRecipes.size(); j++) {
+                                                    for (int x = 0; x < favourites.size(); x++) {
+                                                        if (listRecommendedRecipes.get(j).getId().equals(favourites.get(x))) {
+                                                            Log.d(TAG, "onResponse: 5656565");
+                                                            listRecommendedRecipes.get(j).setFavourite(true);
+                                                        }
+                                                    }
+                                                    Log.d(TAG, "onResponse: " + listRecommendedRecipes.get(j).toString());
+                                                }
+
+                                                String temp = String.valueOf(listRecommendedRecipes.get(0).isFavourite() + " " + listRecommendedRecipes.get(0).getId());
+                                                Log.d(TAG, temp);
+
+
+                                                Log.d(TAG, "onResponse: 11");
+
+                                            }
+                                            recommendedRecipesRecyclerView.setLayoutManager(linearLayoutManagerVertical);
+                                            recommendedRecipesRecyclerView.setAdapter(new RecommendedRecipesAdapter(getApplicationContext(), listRecommendedRecipes));
+
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    }
+                                }, new Response.ErrorListener() {
+
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        // TODO: Handle error
+                                        error.printStackTrace();
+                                    }
+                                }
+
+                              ) {
+
+                            public Map<String, String> getHeaders() {
+                                HashMap<String, String> headers = new HashMap<>();
+                                headers.put("X-Rapidapi-Key", "d061eda37cmshd8c99b385f1e685p177488jsn6dcbb4585857\n");
+                                headers.put("X-Rapidapi-Host", "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
+                                return headers;
+                            }
+                        };
+                        queue.add(jsonObjectRequest);
+                    }
+                });
 
 
     }
 
     private void getHighRatingRecipeAPI() {
 
-        String url = "https://api.spoonacular.com/recipes/random?number=5&apiKey=9a5a4e3d51fa4468aab3ffa22a94a122";
+        String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?number=5";
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -200,7 +304,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                     Log.d(TAG, imageURL);
 
                                                     listHighRating.add(tempHighRatingRecipesItem);
-                                                    listRecommendedRecipes.add(tempHighRatingRecipesItem);
                                                     Log.d(TAG, "onResponse: " + listRecommendedRecipes);
 
                                                     //compare ids and checking that favorits are on the recommended list
@@ -225,10 +328,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                 highRaitingRecyclerView.setLayoutManager(linearLayoutManagerHorizontal);
                                                 highRaitingRecyclerView.setAdapter(new HighRaitingRecipesAdapter(getApplicationContext(), listHighRating));
 
-                                                recommendedRecipesRecyclerView.setLayoutManager(linearLayoutManagerVertical);
-                                                recommendedRecipesRecyclerView.setAdapter(new RecommendedRecipesAdapter(getApplicationContext(), listRecommendedRecipes));
-
-
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
                                             }
@@ -241,7 +340,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             // TODO: Handle error
                                             error.printStackTrace();
                                         }
-                                    });
+                                    }
+
+                                    ) {
+
+                                public Map<String, String> getHeaders() {
+                                    HashMap<String, String> headers = new HashMap<>();
+                                    headers.put("X-Rapidapi-Key", "d061eda37cmshd8c99b385f1e685p177488jsn6dcbb4585857\n");
+                                    headers.put("X-Rapidapi-Host", "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
+                                    return headers;
+                                }
+                            };
 
                             queue.add(jsonObjectRequest);
                     }

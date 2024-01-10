@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +41,32 @@ public class HighRaitingRecipesAdapter extends RecyclerView.Adapter<HighRaitingR
         holder.titleView.setText(highRaitingRecipesItem.getName());
         Picasso.get().load(highRaitingRecipesItem.getImage()).resize(500,500).centerCrop().into(holder.imageView1);
         Log.d(TAG, "onBindViewHolder: in adapter holder");
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(holder.itemView.getContext(), RecipePageActivity.class);
+
+                Log.d(TAG, "onClick id: " + list.get(position).getId());
+                intent.putExtra("id", list.get(position).getId());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                holder.itemView.getContext().startActivity(intent);
+            }
+
+
+        });
+
+        holder.imageView1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(holder.itemView.getContext(), RecipePageActivity.class);
+
+                Log.d(TAG, "onClick id: " + list.get(position).getId());
+                intent.putExtra("id", list.get(position).getId());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                holder.itemView.getContext().startActivity(intent);
+            }
+        });
     }
 
     @Override

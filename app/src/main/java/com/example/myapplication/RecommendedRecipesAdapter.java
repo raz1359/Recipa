@@ -45,6 +45,7 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
 
     @Override
     public void onBindViewHolder(@NonNull RecommendedRecipesHolder holder, int position) {
+
         HighRaitingRecipesItem highRaitingRecipesItem = list.get(position);
 
         holder.titleView.setText(highRaitingRecipesItem.getName());
@@ -78,8 +79,15 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 holder.itemView.getContext().startActivity(intent);
 
+                Toast.makeText(context, "asdads" + list.get(position), Toast.LENGTH_SHORT).show();
+
             }
         });
+    }
+
+    @Override
+    public int getItemCount() {
+        return list.size();
     }
 
     private void addFavourite(int position){
@@ -91,15 +99,35 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
         dbReference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DataSnapshot> task) {
-                        if (task.isSuccessful()){
-                            list.get(position).setFavourite(true);
+                            if (task.isSuccessful()) {
 
-                            String favourites = buildFavsString();
+                                String favorites = task.getResult().getValue().toString();
 
-                            dbReference.setValue(favourites);
+                                Log.d(TAG, "onComplete: 33" + favorites);
+
+
+                                if (favorites != null) {
+
+                                    list.get(position).setFavourite(true);
+                                    favorites += "," + list.get(position).getId();
+                                    dbReference.setValue(favorites);
+                                    Log.d(TAG, "Updated favorites: " + favorites);
+                                } else {
+
+                                    list.get(position).setFavourite(true);
+
+                                    String favourites = buildFavsString();
+
+                                    dbReference.setValue(favourites);
+                                    Log.d(TAG, "New favorites: " + favourites);
+
+                                }
+
+                            } else {
+                            Log.d(TAG, "onComplete: task not successful");
                         }
-                    }
-                });
+                }
+        });
     }
 
     private void removeFavourite(int position){
@@ -122,23 +150,19 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
         });
     }
 
-    private String buildFavsString(){
+    private String buildFavsString() {
         String favouritesStr = "";
         for (HighRaitingRecipesItem item : list){
             if (item.isFavourite) {
 
-                if (favouritesStr.isEmpty()) favouritesStr = item.id;
+                if (favouritesStr.isEmpty())
+                    favouritesStr = item.id;
 
-                else favouritesStr += "," + item.id;
+                else
+                    favouritesStr += "," + item.id;
             }
         }
         return favouritesStr;
     }
+ }
 
-    @Override
-    public int getItemCount() {
-        return list.size();
-    }
-
-
-}

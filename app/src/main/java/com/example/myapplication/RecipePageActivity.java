@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,6 +22,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -34,27 +36,47 @@ import org.jsoup.Jsoup;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class RecipePageActivity extends AppCompatActivity implements View.OnClickListener {
 
     private String TAG = "raz";
 
     private TextView descTv, recipeTitleTv;
-    private ImageView recipeIv, likeIv, ivBack, ivShoppingCart, ivFavorites ;
-    private String id;
+    private ImageView recipeIv, likeIv, ivBack, ivShoppingCart, ivFavorites, ivTextToSpeech ;
+    private String id, desc;
+    boolean isFavorite = true;
+    TextToSpeech t1;
 
 
-    List<String> favourites = new ArrayList<>();
+    FirebaseAuth mAuth;
+    String uID;
+    FirebaseUser currentUser;
 
 
-    // Connect to real time database
-    DatabaseReference datebaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/");
+    ArrayList<String> favourites = new ArrayList<>();
+
+
+    DatabaseReference dbReference;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recipe_page);
+
+        // Firebase initi
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser(); //get current user
+        uID = currentUser.getUid(); // get current user unique ID
+
+        // Connect to real time database
+        dbReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/")
+                .child("users")
+                .child(uID)
+                .child("favourites");
+
+
 
 
         Intent intent = getIntent();
@@ -63,7 +85,7 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
         descTv = findViewById(R.id.desc_tv);
         recipeTitleTv = findViewById(R.id.tvRecipeName);
         recipeIv = findViewById(R.id.recipe_iv);
-        likeIv = findViewById(R.id.ibHeart);
+        likeIv = findViewById(R.id.ibHeartRecipe);
 
         ivBack = findViewById(R.id.ivBack);
         ivBack.setOnClickListener(this);
@@ -74,84 +96,148 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
         ivFavorites = findViewById(R.id.favorite_icon);
         ivFavorites.setOnClickListener(this);
 
+        ivTextToSpeech = findViewById(R.id.textToSpeech);
+
 
         checkFavorite();
+
+        t1 = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if (i != TextToSpeech.ERROR)
+                    t1.setLanguage(Locale.ENGLISH);
+            }
+        });
+
+        ivTextToSpeech.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick: " + Jsoup.parse(desc).text());
+                t1.speak(Jsoup.parse(desc).text(), TextToSpeech.QUEUE_FLUSH, null);
+            }
+        });
+
 
         likeIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                toggleLike();
+
+                Log.d(TAG, "OnHeartClick: ");
+                dbReference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+
+                        if (task.isSuccessful()) {
+
+                            favourites = new ArrayList<>(Arrays.asList(task.getResult().getValue().toString().split(",")));
+                            Log.d(TAG, "onComplete: 33" + favourites);
+
+                            if (!isFavorite) {
+                                Log.d(TAG, "onComplete: is fav true");
+                                likeIv.setImageResource(R.drawable.heart_clicked);
+                                addFavourite();
+                            } else {
+                                Log.d(TAG, "onComplete: not fav");
+                                removeFavourite();
+                                likeIv.setImageResource(R.drawable.heart_not_clicked);
+                            }
+                        }  else {
+                                Log.d(TAG, "onComplete: task not successful");
+                            }
+
+                    }
+                });
             }
         });
 
         loadData();
     }
 
+    private void removeFavourite() {
+        dbReference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (task.isSuccessful()){
+                    favourites = new ArrayList<>(Arrays.asList(task.getResult().getValue().toString().split(",")));
+                    favourites.remove(id);
+
+                    String res = buildFavsString();
+                    dbReference.setValue(res);
+                }
+            }
+        });
+        isFavorite = false;
+    }
+
     private void checkFavorite() {
-        datebaseReference.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("favourites").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                dbReference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DataSnapshot> task) {
                         if (task.isSuccessful()) {
                             if (task.getResult().exists()) {
-                                favourites = Arrays.asList(task.getResult().getValue().toString().split(","));
+                                Log.d(TAG, "onComplete: 888," + task.getResult().getValue().toString());
+                                favourites = new ArrayList<>(Arrays.asList(task.getResult().getValue().toString().split(",")));
                                 if (favourites.contains(id)) {
                                     likeIv.setImageResource(R.drawable.heart_clicked);
+                                    isFavorite = true;
                                 } else {
                                     likeIv.setImageResource(R.drawable.heart_not_clicked);
+                                    isFavorite = false;
                                 }
                             } else {
                                 // Handle the case when favourites is null or empty
                                 likeIv.setImageResource(R.drawable.heart_not_clicked);
+                                isFavorite = false;
                             }
                         }
                     }
                 });
     }
 
-    private void toggleLike() {
-        DatabaseReference dbReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/")
-                .child("users")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("favourites");
-
+    private void addFavourite() {
         dbReference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (task.isSuccessful()) {
-                    favourites = Arrays.asList(task.getResult().getValue().toString().split(","));
 
-                    try {
-                        if (favourites.contains(id)) {
-                            likeIv.setImageResource(R.drawable.heart_not_clicked);
-                            favourites.remove(id);
-                        } else {
-                            likeIv.setImageResource(R.drawable.heart_clicked);
-                            favourites.add(id);
+                    String favorites = task.getResult().getValue().toString();
+                    Log.d(TAG, "onComplete: 999" + favorites);
 
-                        }
+                    if (favorites != null) {
 
-                        String favs = buildFavsString(favourites);
+                        isFavorite = true;
+                        if (favorites.isEmpty()) favorites=id;
+                        else favorites += "," + id;
+                        dbReference.setValue(favorites);
+                        Log.d(TAG, "Updated favorites: " + favorites);
 
-                        dbReference.setValue(favs);
-                    } catch (Exception e) {
-                        // Log the exception
-                        Log.e(TAG, "Error in toggleLike()", e);
+                    } else {
+
+                        isFavorite = true;
+                        String favourites = buildFavsString();
+                        dbReference.setValue(favourites);
+                        Log.d(TAG, "New favorites: " + favourites);
+
                     }
+
+                } else {
+                Log.d(TAG, "onComplete: task not successful");
                 }
             }
         });
     }
 
-    private String buildFavsString(List<String> favourites) {
+    private String buildFavsString() {
 
         String favouritesStr = "";
 
-        for (String item : favourites) {
-            if (favouritesStr.isEmpty()) favouritesStr = item;
-
-            else favouritesStr += "," + item;
+        for (String id: favourites){
+            if (favouritesStr.isEmpty())
+                favouritesStr = id;
+            else
+                favouritesStr += "," +id;
         }
+
         return favouritesStr;
     }
 
@@ -173,7 +259,7 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
                             String recipeId = response.getString("id");
                             String recipeTitle = response.getString("title");
                             String imageUrl = response.getString("image");
-                            String desc = response.getString("summary");
+                            desc = response.getString("summary");
 
                             recipeTitleTv.setText(recipeTitle);
                             descTv.setText(Jsoup.parse(desc).text());
