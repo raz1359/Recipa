@@ -32,10 +32,18 @@
         android:textSize="15dp"></EditText>
 
     <ImageView
+        android:id="@+id/ivBack"
+        android:layout_width="23dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="90dp"
+        app:srcCompat="@drawable/arrow_gray"/>
+
+    <ImageView
         android:id="@+id/searchIcon2"
         android:layout_width="33dp"
         android:layout_height="30dp"
-        android:layout_marginLeft="30dp"
+        android:layout_marginLeft="340dp"
         android:layout_marginTop="82dp"
         android:onClick="updateSearch"
         android:clickable="true"
@@ -62,7 +70,6 @@
         app:itemIconSize="30dp"
         app:labelVisibilityMode="unlabeled"
         android:background="@drawable/nav_background">
-
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 

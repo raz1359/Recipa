@@ -123,6 +123,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
         searchRecyclerView.setHasFixedSize(true);
         searchRecyclerView.setNestedScrollingEnabled(false);
 
+        createRandomRecipeAPI();
     }
 
     // Method to update search results based on user input
@@ -137,7 +138,6 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
 
         Log.d(TAG, "getSearchRecipeAPI: " + recipe);
 
-        //String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/search?query=" + recipe + "&number=5";
         String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch?query=" + recipe + "&number=5";
 
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -226,7 +226,105 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                 });
     }
 
-        @Override
+    // Method to create random Recycler View
+    private void createRandomRecipeAPI() {
+
+        String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?number=5";
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        datebaseReference.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("favourites").get()
+                .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+
+                        //checking if favourites list is null
+                        if (task.getResult().getValue() != null) {
+                            favourites = Arrays.asList(task.getResult().getValue().toString().split(","));
+                        }
+                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                                    @Override
+                                    public void onResponse(JSONObject response) {
+                                        try {
+                                            JSONArray jsonArray = response.getJSONArray("recipes");
+                                            for (int i = 0; i < jsonArray.length(); i++) {
+                                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                                                String id = jsonObject.getString("id");
+                                                String title = jsonObject.getString("title");
+                                                String imageURL = jsonObject.getString("image");
+
+
+                                                boolean isFavourite = false;
+
+
+                                                Picasso.get().load(imageURL).resize(500, 500).centerCrop().noFade();
+
+
+                                                HighRaitingRecipesItem tempHighRatingRecipesItem = new HighRaitingRecipesItem(title, imageURL, id, isFavourite);
+                                                Log.d(TAG, title);
+                                                Log.d(TAG, id);
+                                                Log.d(TAG, imageURL);
+
+                                                listSearch.add(tempHighRatingRecipesItem);
+
+                                                //compare ids and checking that favorits are on the Search list
+                                                for (int j = 0; j < listSearch.size(); j++) {
+                                                    for (int x = 0; x < favourites.size(); x++) {
+                                                        if (listSearch.get(j).getId().equals(favourites.get(x))) {
+                                                            listSearch.get(j).setFavourite(true);
+                                                        }
+                                                    }
+                                                }
+
+                                                String temp = String.valueOf(listSearch.get(0).isFavourite() + " " + listSearch.get(0).getId());
+                                                Log.d(TAG, temp);
+
+
+                                            }
+                                            searchRecyclerView.setLayoutManager(linearLayoutManagerVertical);
+                                            searchRecyclerView.setAdapter(new RecommendedRecipesAdapter(getApplicationContext(), listSearch));
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    }
+                                }, new Response.ErrorListener() {
+
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        // TODO: Handle error
+                                        error.printStackTrace();
+                                    }
+                                }
+
+                                ) {
+
+                            public Map<String, String> getHeaders() {
+                                HashMap<String, String> headers = new HashMap<>();
+                                headers.put("X-Rapidapi-Key", "d061eda37cmshd8c99b385f1e685p177488jsn6dcbb4585857\n");
+                                headers.put("X-Rapidapi-Host", "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
+                                return headers;
+                            }
+//                            @Override
+//                            protected Map<String, String> getParams() {
+//
+//                                Map<String, String> params = new HashMap<String, String>();
+//                                params.put("number","10");
+//                                return params;
+//                            }
+                           };
+
+                        queue.add(jsonObjectRequest);
+                    }
+                });
+    }
+
+    @Override
     public void onClick(View view) {
 
 

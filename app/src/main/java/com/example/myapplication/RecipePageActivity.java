@@ -6,12 +6,16 @@ import android.os.PersistableBundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -19,8 +23,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.myapplication.databinding.ActivityMainBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,18 +41,26 @@ import org.jsoup.Jsoup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
+import kotlin.LateinitKt;
 
 public class RecipePageActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Declare variables for UI elements and functionality
     private String TAG = "raz";
-    private TextView descTv, recipeTitleTv;
+    private TextView descTv, recipeTitleTv, ingredientNumber;
     private ImageView recipeIv, likeIv, ivBack, ivShoppingCart, ivFavorites, ivTextToSpeech ;
     private String id, desc;
     boolean isFavorite = true;
+    Button minus , plus;
     TextToSpeech t1;
+    BottomSheetBehavior mBotttomSheetBehavior;
+    RecyclerView ingredientNamesRv;
+    LinearLayoutManager linearLayoutHorizontal;
 
     // Firebase authentication and database references
     FirebaseAuth mAuth;
@@ -87,6 +101,17 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
         ivShoppingCart = findViewById(R.id.shopping_icon);
         ivFavorites = findViewById(R.id.favorite_icon);
         ivTextToSpeech = findViewById(R.id.textToSpeech);
+        ingredientNamesRv = findViewById(R.id.ingredientsPhotoRV);
+        ingredientNumber = findViewById(R.id.ingredientNumber);
+        minus = findViewById(R.id.minus);
+        plus = findViewById(R.id.plus);
+
+        linearLayoutHorizontal = new LinearLayoutManager(this);
+        linearLayoutHorizontal.setOrientation(LinearLayoutManager.HORIZONTAL);
+
+        View bottomSheet = findViewById(R.id.bottomSheet);
+        mBotttomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        mBotttomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         // Set click listeners for UI elements
         ivBack.setOnClickListener(this);
@@ -96,6 +121,28 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
 
         // Check if the recipe is a favorite and set the appropriate heart icon
         checkFavorite();
+
+        plus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                int num = Integer.valueOf(ingredientNumber.getText().toString());
+                ingredientNumber.setText(String.valueOf(num + 1));
+
+            }
+        });
+
+        minus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                int num = Integer.valueOf(ingredientNumber.getText().toString());
+
+                if (num > 1)
+                ingredientNumber.setText(String.valueOf(num - 1));
+
+            }
+        });
 
         // Initialize TextToSpeech
         t1 = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
@@ -149,6 +196,9 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
 
         // Load recipe data
         loadData();
+
+
+
     }
 
     // Method to remove a recipe from favorites
@@ -251,7 +301,9 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
     private void loadData() {
 
 
-        String url = "https://api.spoonacular.com/recipes/" + id + "/information?apiKey=9a5a4e3d51fa4468aab3ffa22a94a122";
+        String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/" + id.trim() + "/information";
+        Log.d(TAG, "loadData: " + url);
+        Log.d(TAG, "loadData: "  + id);
 
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
@@ -262,11 +314,21 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
                     public void onResponse(JSONObject response) {
 
                         try {
-
                             String recipeId = response.getString("id");
                             String recipeTitle = response.getString("title");
                             String imageUrl = response.getString("image");
                             desc = response.getString("summary");
+                            JSONArray ingredients = response.getJSONArray("extendedIngredients");
+
+                            ArrayList<String> ingredientsNames = new ArrayList<>();
+                            for (int i=0; i<ingredients.length(); i++){
+                                JSONObject ingredient = (JSONObject) ingredients.get(i);
+                                String image = ingredient.getString("image");
+                                String name = ingredient.getString("name");
+
+                                ingredientsNames.add(name);
+                            }
+                            setIngredientsNameRV(ingredientsNames);
 
                             recipeTitleTv.setText(recipeTitle);
                             descTv.setText(Jsoup.parse(desc).text());
@@ -290,10 +352,24 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
                         error.printStackTrace();
 
                     }
-                });
+                }
+
+                ) {
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("X-Rapidapi-Key", "d061eda37cmshd8c99b385f1e685p177488jsn6dcbb4585857\n");
+                headers.put("X-Rapidapi-Host", "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
+                return headers;
+            }
+        };
 
         queue.add(jsonObjectRequest);
 
+    }
+
+    private void setIngredientsNameRV(ArrayList<String> ingredients){
+        ingredientNamesRv.setLayoutManager(linearLayoutHorizontal);
+        ingredientNamesRv.setAdapter(new ingredientPhotoRvAdapter(ingredients));
     }
 
     // Method to handle click events on UI elements
