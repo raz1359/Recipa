@@ -25,19 +25,21 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class FragmentLogin2 extends Fragment implements View.OnClickListener {
 
+    // UI elements
     View view;
     EditText etEmail, etPassword;
     Button btLogin;
+    private FirebaseAuth mAuth;
+
+
+    // Constants
+    private static final String TAG = "Raz";
     Context currentContext;
 
-    private static final String TAG = "Raz";
-
+    // Constructor
     public FragmentLogin2(Context currentContext) {
         this.currentContext = currentContext;
     }
-
-
-    private FirebaseAuth mAuth;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,13 +57,16 @@ public class FragmentLogin2 extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Initialize UI elements
         etEmail = view.findViewById(R.id.editTextEmail);
         etPassword = view.findViewById(R.id.editTextPassword);
         btLogin = view.findViewById(R.id.create);
 
+        // Set onClickListener for Login button
         btLogin.setOnClickListener(this);
     }
 
+    // onClick method
     @Override
     public void onClick(View view) {
 
@@ -74,6 +79,7 @@ public class FragmentLogin2 extends Fragment implements View.OnClickListener {
 
     }
 
+    // Method to SignIn user
     private void signIn(String email, String password) {
         // [START sign_in_with_email]
         mAuth.signInWithEmailAndPassword(email, password)

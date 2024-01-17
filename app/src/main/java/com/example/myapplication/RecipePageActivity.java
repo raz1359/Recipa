@@ -40,23 +40,19 @@ import java.util.Locale;
 
 public class RecipePageActivity extends AppCompatActivity implements View.OnClickListener {
 
+    // Declare variables for UI elements and functionality
     private String TAG = "raz";
-
     private TextView descTv, recipeTitleTv;
     private ImageView recipeIv, likeIv, ivBack, ivShoppingCart, ivFavorites, ivTextToSpeech ;
     private String id, desc;
     boolean isFavorite = true;
     TextToSpeech t1;
 
-
+    // Firebase authentication and database references
     FirebaseAuth mAuth;
     String uID;
     FirebaseUser currentUser;
-
-
     ArrayList<String> favourites = new ArrayList<>();
-
-
     DatabaseReference dbReference;
 
 
@@ -65,12 +61,12 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recipe_page);
 
-        // Firebase initi
+        // Initialize Firebase authentication and database references
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser(); //get current user
         uID = currentUser.getUid(); // get current user unique ID
 
-        // Connect to real time database
+        // Connect to the real-time database
         dbReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/")
                 .child("users")
                 .child(uID)
@@ -78,29 +74,30 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
 
 
 
-
+        // Get recipe ID from the intent
         Intent intent = getIntent();
         id = intent.getStringExtra("id");
 
+        // Initialize UI elements
         descTv = findViewById(R.id.desc_tv);
         recipeTitleTv = findViewById(R.id.tvRecipeName);
         recipeIv = findViewById(R.id.recipe_iv);
         likeIv = findViewById(R.id.ibHeartRecipe);
-
         ivBack = findViewById(R.id.ivBack);
-        ivBack.setOnClickListener(this);
-
         ivShoppingCart = findViewById(R.id.shopping_icon);
-        ivShoppingCart.setOnClickListener(this);
-
         ivFavorites = findViewById(R.id.favorite_icon);
-        ivFavorites.setOnClickListener(this);
-
         ivTextToSpeech = findViewById(R.id.textToSpeech);
 
+        // Set click listeners for UI elements
+        ivBack.setOnClickListener(this);
+        ivShoppingCart.setOnClickListener(this);
+        ivFavorites.setOnClickListener(this);
 
+
+        // Check if the recipe is a favorite and set the appropriate heart icon
         checkFavorite();
 
+        // Initialize TextToSpeech
         t1 = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
@@ -108,7 +105,7 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
                     t1.setLanguage(Locale.ENGLISH);
             }
         });
-
+        // Set TextToSpeech functionality
         ivTextToSpeech.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,11 +114,11 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
             }
         });
 
-
+        // Set click listener for the heart icon to add/remove from favorites
         likeIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                // Check if the recipe is a favorite and update the heart icon
                 Log.d(TAG, "OnHeartClick: ");
                 dbReference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
@@ -150,10 +147,13 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
             }
         });
 
+        // Load recipe data
         loadData();
     }
 
+    // Method to remove a recipe from favorites
     private void removeFavourite() {
+        // Remove the recipe ID from the favorites list
         dbReference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -161,6 +161,7 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
                     favourites = new ArrayList<>(Arrays.asList(task.getResult().getValue().toString().split(",")));
                     favourites.remove(id);
 
+                    // Update the favorites string in the database
                     String res = buildFavsString();
                     dbReference.setValue(res);
                 }
@@ -169,6 +170,8 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
         isFavorite = false;
     }
 
+
+    // Method to check if a recipe is a favorite
     private void checkFavorite() {
                 dbReference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
@@ -185,7 +188,7 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
                                     isFavorite = false;
                                 }
                             } else {
-                                // Handle the case when favourites is null or empty
+                                // Handle the case when favorites are null or empty
                                 likeIv.setImageResource(R.drawable.heart_not_clicked);
                                 isFavorite = false;
                             }
@@ -194,6 +197,8 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
                 });
     }
 
+
+    // Method to add a recipe to favorites
     private void addFavourite() {
         dbReference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
@@ -227,6 +232,7 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
         });
     }
 
+    // Method to build a comma-separated string from the favorites list
     private String buildFavsString() {
 
         String favouritesStr = "";
@@ -241,6 +247,7 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
         return favouritesStr;
     }
 
+    // Method to load recipe data from the Spoonacular API
     private void loadData() {
 
 
@@ -289,6 +296,7 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
 
     }
 
+    // Method to handle click events on UI elements
     @Override
     public void onClick(View view) {
         Intent intent;

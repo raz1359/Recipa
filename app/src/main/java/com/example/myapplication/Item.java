@@ -4,12 +4,12 @@ import android.graphics.Bitmap;
 
 public class Item {
 
-    private String title;
-    private String date;
-    private String subtitle;
-    private Bitmap bitmap;
+    private String title; // Title of the item
+    private String date; // Date associated with the item
+    private String subtitle; // Subtitle or additional information about the item
+    private Bitmap bitmap; // Bitmap image associated with the item
 
-    // constructor
+    // Constructor for creating an Item
     public Item(String title, String date, String subtitle, Bitmap bitmap) {
 
         this.title = title;
@@ -18,7 +18,7 @@ public class Item {
         this.bitmap = bitmap;
     }
 
-    // getters and setters
+    // Getters and Setters
     public String getTitle() {
         return title;}
 

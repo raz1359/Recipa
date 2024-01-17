@@ -26,6 +26,8 @@ import com.google.firebase.auth.FirebaseUser;
 public class login extends AppCompatActivity {
 
     Button fragment1bt, fragment2btn;
+
+    // Firebase authentication instance
     public static FirebaseAuth mAuth = FirebaseAuth.getInstance();;
     private static final String TAG = "login";
 
@@ -34,21 +36,22 @@ public class login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        Log.d(TAG, "onCreate: login 111");
-        
+
+        // Initialize UI elements and fragments
         fragment1bt = findViewById(R.id.fragment1btn);
         fragment2btn = findViewById(R.id.fragment2btn);
 
-       replaceFragment(new FragmentLogin1(this));
-       findViewById(R.id.lineSignUp).setAlpha(1);
+        // Set the initial fragment to FragmentLogin1
+        replaceFragment(new FragmentLogin1(this));
+        findViewById(R.id.lineSignUp).setAlpha(1);
         TextView signUp = findViewById(R.id.fragment2btn);
         signUp.setTextColor(Color.parseColor("#8ADBA5"));
 
-
+        // Set click listeners for fragment buttons
         fragment1bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // Switch to FragmentLogin1
                 replaceFragment(new FragmentLogin1(login.this));
                 overridePendingTransition(0,0);
 
@@ -64,8 +67,6 @@ public class login extends AppCompatActivity {
 
             }
         });
-
-
         fragment2btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,7 +89,6 @@ public class login extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart: ");
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
@@ -97,14 +97,14 @@ public class login extends AppCompatActivity {
     }
     // [END on_start_check_user]
 
-
+    // Replace the current fragment with a new one
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout,fragment);
         fragmentTransaction.commit();
     }
-
+    // Replace the current fragment with a new one
     private void repalceFragment(Fragment fragment) {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -113,8 +113,9 @@ public class login extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
+    // Method to update UI based on the user's authentication state
     private void updateUI(FirebaseUser user) {
-
+        // Implement UI updates as needed
     }
 
 }

@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -50,8 +52,9 @@ import java.util.Map;
 
 public class Search extends AppCompatActivity implements View.OnClickListener {
 
-    public ImageView searchImage;
-    public EditText searchBar;
+    // Declare UI elements
+    ImageView searchImage;
+    EditText searchBar;
     private static final String TAG = "raz";
     private BottomNavigationView bottomNavigationView;
     RecyclerView searchRecyclerView;
@@ -59,11 +62,9 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
 
     LinearLayoutManager linearLayoutManagerVertical;
     List<HighRaitingRecipesItem> listSearch = new ArrayList<HighRaitingRecipesItem>();
-
     List<String> favourites = new ArrayList<>();
 
-
-    // Connect to real time database
+    // Connect to real-time database
     DatabaseReference datebaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/");
 
     @Override
@@ -71,12 +72,13 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        // Initialize UI elements
         searchImage = findViewById(R.id.searchIcon2);
-
         searchBar = findViewById(R.id.search_bar2);
         searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
+                // Change background and icon based on focus
                 if (hasFocus) {
                     searchBar.setBackground(ContextCompat.getDrawable(Search.this, R.drawable.edit_text_search_selected));
                     searchImage.setImageResource(R.drawable.searchbar_onpng);
@@ -87,6 +89,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
             }
         });
 
+        // Bottom navigation setup
         bottomNavigationView = findViewById(R.id.bottomNavBar);
         bottomNavigationView.setSelectedItemId(R.id.searchBT);
 
@@ -113,19 +116,29 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
             return false;
         });
 
-        // RecyclerView By Search
+        // RecyclerView setup for search results
         linearLayoutManagerVertical = new LinearLayoutManager(this);
         linearLayoutManagerVertical.setOrientation(LinearLayoutManager.VERTICAL);
         searchRecyclerView = findViewById(R.id.recyclViewSearch);
         searchRecyclerView.setHasFixedSize(true);
         searchRecyclerView.setNestedScrollingEnabled(false);
 
-        getSearchRecipeAPI();
     }
 
-    private void getSearchRecipeAPI() {
+    // Method to update search results based on user input
+    public void updateSearch(View view) {
 
-        String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?number=5";
+        listSearch.clear();
+        Log.d(TAG, "onCreate: " + search);
+        getSearchRecipeAPI(searchBar.getText().toString().trim());
+    }
+
+    private void getSearchRecipeAPI(String recipe) {
+
+        Log.d(TAG, "getSearchRecipeAPI: " + recipe);
+
+        //String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/search?query=" + recipe + "&number=5";
+        String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch?query=" + recipe + "&number=5";
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -145,7 +158,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                                     @Override
                                     public void onResponse(JSONObject response) {
                                         try {
-                                            JSONArray jsonArray = response.getJSONArray("recipes");
+                                            JSONArray jsonArray = response.getJSONArray("results");
                                             for (int i = 0; i < jsonArray.length(); i++) {
                                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -180,7 +193,6 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                                                 Log.d(TAG, temp);
 
 
-
                                             }
                                             searchRecyclerView.setLayoutManager(linearLayoutManagerVertical);
                                             searchRecyclerView.setAdapter(new RecommendedRecipesAdapter(getApplicationContext(), listSearch));
@@ -212,11 +224,9 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                         queue.add(jsonObjectRequest);
                     }
                 });
-
-
     }
 
-    @Override
+        @Override
     public void onClick(View view) {
 
 

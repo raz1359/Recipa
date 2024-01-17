@@ -30,12 +30,14 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
     List<HighRaitingRecipesItem> list;
     private static final String TAG = "raz";
 
+    // Constructor for the adapter
     public RecommendedRecipesAdapter(Context context, List<HighRaitingRecipesItem> list) {
         this.context = context;
         this.list = list;
         Log.d(TAG, "RecommendedRecipesAdapter: after constructor");
     }
 
+    // Create new views (invoked by the layout manager)
     @NonNull
     @Override
     public RecommendedRecipesHolder onCreateViewHolder( ViewGroup parent, int viewType) {
@@ -43,25 +45,31 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
         return new RecommendedRecipesHolder(view);
     }
 
+    // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(@NonNull RecommendedRecipesHolder holder, int position) {
-
+        // Get the data model based on position
         HighRaitingRecipesItem highRaitingRecipesItem = list.get(position);
 
+        // Set the data for each item in the RecyclerView
         holder.titleView.setText(highRaitingRecipesItem.getName());
         Picasso.get().load(highRaitingRecipesItem.getImage()).resize(500,500).centerCrop().into(holder.imageView1);
         Log.d(TAG, "onBindViewHolder: in adapter holder");
 
+        // Check if the recipe is marked as a favorite
         if (list.get(position).isFavourite == true)
             holder.likeBtn.setImageResource(R.drawable.heart_clicked);
 
+        // Handle the click event for the like button
         holder.likeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // If already a favorite, remove from favorites
                 if (list.get(position).isFavourite){
                     holder.likeBtn.setImageResource(R.drawable.heart_not_clicked);
                     removeFavourite(position);
                 }else{
+                    // If not a favorite, add to favorites
                     holder.likeBtn.setImageResource(R.drawable.heart_clicked);
                     addFavourite(position);
                 }
@@ -69,9 +77,11 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
             }
         });
 
+        // Handle the click event for the entire item view
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Start RecipePageActivity when an item is clicked
                 Intent intent = new Intent(holder.itemView.getContext(), RecipePageActivity.class);
 
                 Log.d(TAG, "onClick id: " + list.get(position).getId());
@@ -84,12 +94,13 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
             }
         });
     }
-
+    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return list.size();
     }
 
+    // Method to add a recipe to the user's favorites
     private void addFavourite(int position){
         DatabaseReference dbReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/")
                 .child("users")
@@ -130,6 +141,7 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
         });
     }
 
+    // Method to remove a recipe from the user's favorites
     private void removeFavourite(int position){
         DatabaseReference dbReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/")
                 .child("users")
@@ -150,6 +162,7 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
         });
     }
 
+    // Method to build a string of favorites for storage in the database
     private String buildFavsString() {
         String favouritesStr = "";
         for (HighRaitingRecipesItem item : list){

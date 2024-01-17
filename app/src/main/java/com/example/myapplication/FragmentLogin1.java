@@ -34,16 +34,19 @@ import java.util.concurrent.Executor;
 
 public class FragmentLogin1 extends Fragment implements View.OnClickListener {
 
+    // UI elements
     View view;
     ImageView icon;
     TextView passwordFail;
     static EditText etEmail,etPassword, etPasswordConfirm;
     Button btnCreate;
+
+    // Constants
     private static final String TAG = "Raz";
     public Context currentContext;
 
 
-
+    // Constructor
     public FragmentLogin1(Context currentContext) {
         this.currentContext = currentContext;
     }
@@ -51,12 +54,9 @@ public class FragmentLogin1 extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_login1, container, false);
         return view;
-
 
     }
 
@@ -64,6 +64,7 @@ public class FragmentLogin1 extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Initialize UI elements
         etEmail = view.findViewById(R.id.editTextEmail);
         etPassword = view.findViewById(R.id.editTextPassword);
         etPasswordConfirm = view.findViewById(R.id.editTextConfirmPassword);
@@ -71,9 +72,11 @@ public class FragmentLogin1 extends Fragment implements View.OnClickListener {
         icon = view.findViewById(R.id.icon_error);
         passwordFail = view.findViewById(R.id.passwordNotEqual);
 
+        // Set onClickListener for the create button
         btnCreate.setOnClickListener(this);
     }
 
+    // onClick method
     @Override
     public void onClick(View view) {
 
@@ -106,6 +109,7 @@ public class FragmentLogin1 extends Fragment implements View.OnClickListener {
 
     }
 
+    // Method to check if passwords are equal
     public Boolean passwordEqualse (String password1 , String password2) {
 
         if (password1.equals(password2))
@@ -113,7 +117,7 @@ public class FragmentLogin1 extends Fragment implements View.OnClickListener {
         return false;
     }
 
-
+    // Method to create a user account
     public void createAccount(String email, String password) {
         // START create_user_with_email
         Log.d(TAG, "createAccount: Inside create account");

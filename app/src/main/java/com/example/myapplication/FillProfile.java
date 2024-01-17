@@ -64,6 +64,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fill_profile);
 
+        // Initialize UI elements
         backArrow = findViewById(R.id.ivbackProfile);
         backArrow.setOnClickListener(this);
 
@@ -83,6 +84,11 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         btnSignOut = findViewById(R.id.btnSignout);
         btnSignOut.setOnClickListener(this);
 
+        // Initialize Firebase components
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        uID = currentUser.getUid();
+        Log.d(TAG, uID);
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
@@ -111,44 +117,11 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
 
         });
 
-        //Initialize Firebase
-        mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
-        uID = currentUser.getUid();
-        Log.d(TAG, uID);
 
         // Retrieve data from Firebase
         retrieveDate();
     }
-
-    private void retrieveDate() {
-        // Retrieve FullName, Nickname, Profile Image
-        datebaseReference.child("users").child(uID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Profile profileTemp = snapshot.getValue(Profile.class);
-
-                if (profileTemp != null && profileTemp.getImageUri() != null) {
-                    Log.d(TAG, "onDataChange: capcap " + profileTemp.getNickName()
-                            + " " + profileTemp.getFullName() + " " + profileTemp.getImageUri());
-
-                    //set EditText values
-                    etFullName.setText(profileTemp.getFullName());
-                    etNickname.setText(profileTemp.getNickName());
-                    url = profileTemp.getImageUri();
-
-                    Picasso.get().load(url).resize(470, 470).centerCrop().noFade().into(profilePic);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-
+    // Method to choose a picture from the gallery
     private void choosePicture() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -156,6 +129,7 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
 
     }
 
+    // Method to upload the selected picture to Firebase Storage
     private void uploadPicture() {
 
         final ProgressDialog pd = new ProgressDialog(this);
@@ -200,29 +174,52 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
                 });
     }
 
+    // Method to retrieve data from Firebase
+    private void retrieveDate() {
+        // Retrieve FullName, Nickname, Profile Image
+        datebaseReference.child("users").child(uID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Profile profileTemp = snapshot.getValue(Profile.class);
 
+                if (profileTemp != null && profileTemp.getImageUri() != null) {
+
+                    // Set EditText values and load profile image
+                    etFullName.setText(profileTemp.getFullName());
+                    etNickname.setText(profileTemp.getNickName());
+                    url = profileTemp.getImageUri();
+                    Picasso.get().load(url).resize(470, 470).centerCrop().noFade().into(profilePic);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle onCancelled
+
+            }
+        });
+    }
+
+    // onClick method, called when a UI element is clicked
     @Override
     public void onClick(View view) {
 
         Intent intent;
         if (view.getId() == R.id.btnSignout) {
             mAuth.signOut();
-
             intent = new Intent(this, login.class);
             startActivity(intent);
             finish();
+
         } else if (view.getId() == R.id.ivbackProfile) {
             intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivityForResult(intent,0);
+
         } else {
             String tempName = etFullName.getText().toString();
             String tempNickname = etNickname.getText().toString();
 
             profile = new Profile(tempName, tempNickname, url, "");
-            Log.d(TAG, "Get name and nickname: " + profile.getFullName()
-                    + " " + profile.getNickName() + " " + profile.getImageUri());
-            Log.d(TAG, "upload profile" + profile.toString());
 
             datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).setValue(profile);
             intent = new Intent(this, MainActivity.class);

@@ -4,13 +4,17 @@ import android.graphics.Bitmap;
 
 public class HighRaitingRecipesItem {
 
+    // Fields representing the properties of a recipe item
     String name,image,id;
     boolean isFavourite;
 
+
+    // Default constructor for Firebase
     public HighRaitingRecipesItem() {
-        // firebase
+        // Firebase constructor
     }
 
+    // Parameterized constructor to initialize the fields with values
     public HighRaitingRecipesItem(String name, String image, String id, boolean isFavourite) {
         this.name = name;
         this.id = id;

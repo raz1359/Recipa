@@ -22,6 +22,7 @@
         android:paddingRight="20dp"
         android:paddingBottom="8dp"
         android:ems="10"
+        android:inputType="textFilter"
         android:fontFamily="@font/urbanist_medium"
         android:hint="What are you looking for?"
 
@@ -36,6 +37,8 @@
         android:layout_height="30dp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="82dp"
+        android:onClick="updateSearch"
+        android:clickable="true"
         app:srcCompat="@drawable/search_icon2"></ImageView>
 
     <androidx.recyclerview.widget.RecyclerView

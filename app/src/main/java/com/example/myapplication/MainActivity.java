@@ -51,69 +51,86 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
+    // Declare UI elements
     public Button button;
     public ImageView notificationImage, searchImage,profileImage, favoritesImage;
     public EditText searchBar;
     private static final String TAG = "raz";
     private BottomNavigationView bottomNavigationView;
-    FirebaseAuth mAuth;
-    public String uID;
-    FirebaseUser currentUser;
     RecyclerView highRaitingRecyclerView,recommendedRecipesRecyclerView;
     ImageButton ibHeart;
 
-    // creating two linearLayoutManger
+    // Firebase authentication and user information
+    FirebaseAuth mAuth;
+    public String uID;
+    FirebaseUser currentUser;
+
+
+    // RecyclerViews and adapters for displaying high rating and recommended recipes
     LinearLayoutManager linearLayoutManagerHorizontal , linearLayoutManagerVertical;
     List<HighRaitingRecipesItem> listHighRating = new ArrayList<HighRaitingRecipesItem>();
     List<HighRaitingRecipesItem> listRecommendedRecipes = new ArrayList<HighRaitingRecipesItem>();
-
     List<String> favourites = new ArrayList<>();
 
 
-    // Connect to real time database
+    // Firebase Realtime Database reference
     DatabaseReference datebaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/");
 
+
+    // onCreate method, called when the activity is created
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Firebase initi
+        // Initialize Firebase authentication and get current user information
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser(); //get current user
         uID = currentUser.getUid(); // get current user unique ID
 
+        // Initialize UI elements
         searchBar = findViewById(R.id.search_bar);
-
         notificationImage = findViewById(R.id.notification);
         notificationImage.setOnClickListener(this);
-
         favoritesImage = findViewById(R.id.favorite_icon);
         favoritesImage.setOnClickListener(this);
-
         profileImage = findViewById(R.id.emptyProfile);
         profileImage.setOnClickListener(this);
-
         searchImage = findViewById(R.id.searchIcon);
 
+        // Bottom navigation setup
         bottomNavigationView = findViewById(R.id.bottomNavBar);
         bottomNavigationView.setSelectedItemId(R.id.homeBT);
 
 
-        // HighRaiting RecycleView
+        // High rating RecyclerView setup
         highRaitingRecyclerView = findViewById(R.id.recyclViewHighRating);
         highRaitingRecyclerView.setHasFixedSize(true);
         linearLayoutManagerHorizontal = new LinearLayoutManager(this);
         linearLayoutManagerHorizontal.setOrientation(LinearLayoutManager.HORIZONTAL);
 
-        // RecommendedRecipes RecycleView
+        // Recommended recipes RecyclerView setup
         linearLayoutManagerVertical = new LinearLayoutManager(this);
         linearLayoutManagerVertical.setOrientation(LinearLayoutManager.VERTICAL);
         recommendedRecipesRecyclerView = findViewById(R.id.recyclerViewRecommendedRecipes);
         recommendedRecipesRecyclerView.setHasFixedSize(true);
         recommendedRecipesRecyclerView.setNestedScrollingEnabled(false);
 
+        // Add focus change listener to the search bar for UI updates
+        searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            public void onFocusChange(View v, boolean hasFocus) {
+                // Change background and icon based on focus
+                if (hasFocus) {
+                    searchBar.setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.edit_text_search_selected));
+                    searchImage.setImageResource(R.drawable.searchbar_onpng);
+                } else {
+                    searchBar.setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.edit_text_search));
+                    searchImage.setImageResource(R.drawable.search_icon2);
+                }
+            }
+        });
 
+        // Bottom navigation item selection listener
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()){
                 case R.id.homeBT:
@@ -138,30 +155,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         });
 
+        // Retrieve user data from Firebase Realtime Database
         retrieveData();
 
-
-        searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    searchBar.setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.edit_text_search_selected));
-                    searchImage.setImageResource(R.drawable.searchbar_onpng);
-                } else {
-                    searchBar.setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.edit_text_search));
-                    searchImage.setImageResource(R.drawable.search_icon2);
-                }
-            }
-        });
-
-         getHighRatingRecipeAPI();
+        // Fetch high rating and recommended recipes from API
+        getHighRatingRecipeAPI();
          getRecommendedRecipeAPI();
-
 
     }
 
     private void getRecommendedRecipeAPI() {
 
-        String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?number=5";
+        String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?number=2";
 
 
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -255,13 +260,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         queue.add(jsonObjectRequest);
                     }
                 });
-
-
     }
 
     private void getHighRatingRecipeAPI() {
 
-        String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?number=5";
+        String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?number=2";
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -356,7 +359,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
 
-
     }
 
     private void retrieveData() {
@@ -380,6 +382,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+
     @Override
     public void onClick(View view) {
         Intent intent;
@@ -401,8 +404,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
         Log.d(TAG, "onNavigationItemSelected: " + item.getItemId());
 
         return false;

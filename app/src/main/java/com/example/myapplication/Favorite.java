@@ -41,6 +41,7 @@ import java.util.List;
 
 public class Favorite extends AppCompatActivity implements View.OnClickListener {
 
+    // Declare variables for UI elements and functionality
     ImageView imageView;
     RecyclerView favoriteRecyclerView;
     FirebaseAuth mAuth;
@@ -55,7 +56,7 @@ public class Favorite extends AppCompatActivity implements View.OnClickListener 
     List<HighRaitingRecipesItem> listFavoritesRecipes = new ArrayList<HighRaitingRecipesItem>();
 
 
-    // Connect to real time database
+    // Connect to the real-time database
     DatabaseReference datebaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/");
 
     @Override
@@ -64,23 +65,25 @@ public class Favorite extends AppCompatActivity implements View.OnClickListener 
         setContentView(R.layout.activity_favorite);
         Log.d(TAG, "onCreate: ");
 
-        // Firebase initi
+        // Initialize Firebase authentication
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser(); //get current user
         uID = currentUser.getUid(); // get current user unique ID
 
+        // Initialize UI elements
         imageView = findViewById(R.id.ivBack);
         imageView.setOnClickListener(this);
 
         favoriteRecyclerView = findViewById(R.id.favoritesRecyclerView);
-
         linearLayoutManagerVertical = new LinearLayoutManager(this);
 
+        // Query the real-time database to get user's favorites
         datebaseReference.child("users").child(uID).child("favourites").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Log.d(TAG, "onDataChange: ");
 
+                // Get the user's favorites from the database
                 String favoriteList = snapshot.getValue().toString();
                 Log.d(TAG, "onDataChange: " + favoriteList);
 
@@ -89,10 +92,11 @@ public class Favorite extends AppCompatActivity implements View.OnClickListener 
                     List<String> listRecipes = new ArrayList<>(Arrays.asList(favoriteList.split(",")));
                     Log.d(TAG, "ID list: " + listRecipes);
 
-                    // Declare a counter for completed requests
+                    // Declare counters for total and completed requests
                     totalRequests = listRecipes.size();
                     completedRequests = 0;
 
+                    // Iterate through the list of recipe IDs
                     for (int i = 0; i < totalRequests; i++) {
                         Log.d(TAG, "onDataChange: 2222");
                         String url = "https://api.spoonacular.com/recipes/" + listRecipes.get(i) + "/information?apiKey=9a5a4e3d51fa4468aab3ffa22a94a122";
@@ -237,9 +241,11 @@ public class Favorite extends AppCompatActivity implements View.OnClickListener 
 
     }
 
+    // onClick method, called when a UI element is clicked
     @Override
     public void onClick(View view) {
-        Log.d(TAG, "onClick: ");
+        Log.d(TAG, "Start the MainActivity ");
+        // Start the MainActivity
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
 
