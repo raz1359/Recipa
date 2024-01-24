@@ -180,7 +180,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         //checking if favourites list is null
                         if (task.getResult().getValue() != null) {
                             favourites = Arrays.asList(task.getResult().getValue().toString().split(","));
-                            Log.d(TAG, "onComplete: " + favourites.toString());
                         }
                         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -210,24 +209,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                 Log.d(TAG, imageURL);
 
                                                 listRecommendedRecipes.add(tempHighRatingRecipesItem);
-                                                Log.d(TAG, "onResponse: " + listRecommendedRecipes);
 
                                                 //compare ids and checking that favorits are on the recommended list
                                                 for (int j = 0; j < listRecommendedRecipes.size(); j++) {
                                                     for (int x = 0; x < favourites.size(); x++) {
                                                         if (listRecommendedRecipes.get(j).getId().equals(favourites.get(x))) {
-                                                            Log.d(TAG, "onResponse: 5656565");
                                                             listRecommendedRecipes.get(j).setFavourite(true);
                                                         }
                                                     }
-                                                    Log.d(TAG, "onResponse: " + listRecommendedRecipes.get(j).toString());
                                                 }
 
                                                 String temp = String.valueOf(listRecommendedRecipes.get(0).isFavourite() + " " + listRecommendedRecipes.get(0).getId());
                                                 Log.d(TAG, temp);
 
-
-                                                Log.d(TAG, "onResponse: 11");
 
                                             }
                                             recommendedRecipesRecyclerView.setLayoutManager(linearLayoutManagerVertical);

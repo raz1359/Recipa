@@ -15,6 +15,7 @@ public class ingredientPhotoRvAdapter extends RecyclerView.Adapter<ingredientPho
 
     private ArrayList<String> names;
 
+    // Constructor for the adapter
     public ingredientPhotoRvAdapter (ArrayList<String> names){
         this.names = names;
     }

@@ -120,7 +120,7 @@
     <LinearLayout
         android:id="@+id/bottomSheet"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="760dp"
         android:background="@drawable/information_background"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:behavior_hideable="false"
@@ -156,11 +156,34 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/ingredientsPhotoRV"
                 android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_height="100dp"
                 android:layout_below="@id/Ingredients"
                 android:layout_marginStart="40dp"
                 android:overScrollMode="never"
                 android:scrollbars="horizontal"/>
+
+        <TextView
+            android:id="@+id/directions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ingredientsPhotoRV"
+            android:padding="20dp"
+            android:text="Instructions"
+            android:textSize="22dp"
+            android:textStyle="bold"
+            android:layout_marginStart="10dp"
+            android:fontFamily="@font/urbanist_light"
+            android:textColor="#272727"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/stepsRV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/directions"
+                android:layout_marginStart="40dp"
+                android:overScrollMode="always"
+                android:scrollbars="vertical"/>
+
         </RelativeLayout>
     </LinearLayout>
 

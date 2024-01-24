@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:paddingRight="20dp">
+    android:paddingRight="12dp">
 
     <ImageView
         android:id="@+id/ellipse"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="7dp"
+        android:layout_height="7dp"
         android:layout_marginRight="10dp"
-        android:src="@drawable/ellipse"/>
+        android:layout_marginTop="11sp"
+        android:src="@drawable/ellipse" />
 
     <TextView
         android:id="@+id/ingredientName"

@@ -34,7 +34,6 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
     public RecommendedRecipesAdapter(Context context, List<HighRaitingRecipesItem> list) {
         this.context = context;
         this.list = list;
-        Log.d(TAG, "RecommendedRecipesAdapter: after constructor");
     }
 
     // Create new views (invoked by the layout manager)
@@ -54,7 +53,6 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
         // Set the data for each item in the RecyclerView
         holder.titleView.setText(highRaitingRecipesItem.getName());
         Picasso.get().load(highRaitingRecipesItem.getImage()).resize(500,500).centerCrop().into(holder.imageView1);
-        Log.d(TAG, "onBindViewHolder: in adapter holder");
 
         // Check if the recipe is marked as a favorite
         if (list.get(position).isFavourite == true)
@@ -73,7 +71,6 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
                     holder.likeBtn.setImageResource(R.drawable.heart_clicked);
                     addFavourite(position);
                 }
-                //Toast.makeText(holder.itemView.getContext(), "Like btn clicked, position: " + position, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -84,12 +81,10 @@ public class RecommendedRecipesAdapter extends RecyclerView.Adapter <Recommended
                 // Start RecipePageActivity when an item is clicked
                 Intent intent = new Intent(holder.itemView.getContext(), RecipePageActivity.class);
 
-                Log.d(TAG, "onClick id: " + list.get(position).getId());
                 intent.putExtra("id", list.get(position).getId());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 holder.itemView.getContext().startActivity(intent);
 
-                Toast.makeText(context, "asdads" + list.get(position), Toast.LENGTH_SHORT).show();
 
             }
         });

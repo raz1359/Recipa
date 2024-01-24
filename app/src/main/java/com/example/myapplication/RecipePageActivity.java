@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -59,8 +60,10 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
     Button minus , plus;
     TextToSpeech t1;
     BottomSheetBehavior mBotttomSheetBehavior;
-    RecyclerView ingredientNamesRv;
-    LinearLayoutManager linearLayoutHorizontal;
+    RecyclerView ingredientNamesRv, stepsRV;
+    LinearLayoutManager linearLayoutHorizontal, linearLayoutVertical;
+    RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this , 4, LinearLayoutManager.HORIZONTAL, false);
+
 
     // Firebase authentication and database references
     FirebaseAuth mAuth;
@@ -102,12 +105,15 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
         ivFavorites = findViewById(R.id.favorite_icon);
         ivTextToSpeech = findViewById(R.id.textToSpeech);
         ingredientNamesRv = findViewById(R.id.ingredientsPhotoRV);
+        stepsRV = findViewById(R.id.stepsRV);
         ingredientNumber = findViewById(R.id.ingredientNumber);
         minus = findViewById(R.id.minus);
         plus = findViewById(R.id.plus);
 
         linearLayoutHorizontal = new LinearLayoutManager(this);
         linearLayoutHorizontal.setOrientation(LinearLayoutManager.HORIZONTAL);
+        linearLayoutVertical = new LinearLayoutManager(this);
+        linearLayoutVertical.setOrientation(LinearLayoutManager.VERTICAL);
 
         View bottomSheet = findViewById(R.id.bottomSheet);
         mBotttomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
@@ -319,9 +325,10 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
                             String imageUrl = response.getString("image");
                             desc = response.getString("summary");
                             JSONArray ingredients = response.getJSONArray("extendedIngredients");
+                            JSONArray instructions = response.getJSONArray("analyzedInstructions");
 
                             ArrayList<String> ingredientsNames = new ArrayList<>();
-                            for (int i=0; i<ingredients.length(); i++){
+                            for (int i = 0; i < ingredients.length(); i++) {
                                 JSONObject ingredient = (JSONObject) ingredients.get(i);
                                 String image = ingredient.getString("image");
                                 String name = ingredient.getString("name");
@@ -330,14 +337,32 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
                             }
                             setIngredientsNameRV(ingredientsNames);
 
+                            ArrayList<stepsItem> steps = new ArrayList<>();
+                            JSONArray beforeSteps;
+                            for (int i = 0; i < instructions.length(); i++) {
+                                JSONObject instruction = (JSONObject) instructions.get(i);
+                                Log.d(TAG, "onResponse22: " + instruction.toString());
+                                beforeSteps = instruction.getJSONArray("steps");
+                                Log.d(TAG, "steps level: " + beforeSteps);
+                                for (int j = 0; j < beforeSteps.length(); j++){
+                                    JSONObject info = (JSONObject) beforeSteps.get(j);
+                                    String number = info.getString("number");
+                                    String step = info.getString("step");
+                                    Log.d(TAG, "number: " + number);
+                                    Log.d(TAG, "step: " + step);
+
+                                    stepsItem stepsItemTemp = new stepsItem(number,step);
+                                    steps.add(stepsItemTemp);
+                                }
+                            }
+                            stepsRV.setLayoutManager(linearLayoutVertical);
+                            stepsRV.setNestedScrollingEnabled(false);
+                            stepsRV.setAdapter(new stepsRvAdapter(steps,getApplicationContext()));
+
+
                             recipeTitleTv.setText(recipeTitle);
                             descTv.setText(Jsoup.parse(desc).text());
                             Picasso.get().load(imageUrl).resize(530, 500).centerCrop().noFade().into(recipeIv);
-
-
-                            Log.d(TAG, "Recipe ID: " + recipeId);
-                            Log.d(TAG, "Recipe Title: " + recipeTitle);
-                            Log.d(TAG, "Image URL: " + imageUrl);
 
 
                         } catch (JSONException e) {
@@ -368,8 +393,12 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void setIngredientsNameRV(ArrayList<String> ingredients){
-        ingredientNamesRv.setLayoutManager(linearLayoutHorizontal);
+        ingredientNamesRv.setLayoutManager(layoutManager);
         ingredientNamesRv.setAdapter(new ingredientPhotoRvAdapter(ingredients));
+    }
+
+    private void setStepsRV(ArrayList<String> steps) {
+
     }
 
     // Method to handle click events on UI elements
