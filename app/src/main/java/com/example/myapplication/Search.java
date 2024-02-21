@@ -58,7 +58,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "raz";
     private BottomNavigationView bottomNavigationView;
     RecyclerView searchRecyclerView;
-    String search;
+    String search, searchFromMain, breakfast, lunch, dinner;
 
     LinearLayoutManager linearLayoutManagerVertical;
     List<HighRaitingRecipesItem> listSearch = new ArrayList<HighRaitingRecipesItem>();
@@ -123,20 +123,53 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
         searchRecyclerView.setHasFixedSize(true);
         searchRecyclerView.setNestedScrollingEnabled(false);
 
-        createRandomRecipeAPI();
+        // Get searched recipe from MainActivity
+        Intent intent = getIntent();
+        searchFromMain = intent.getStringExtra("search");
+        Log.d(TAG, "onCreate search: " + searchFromMain);
+
+        // Get categories from MainActivity
+        breakfast = intent.getStringExtra("breakfast");
+        lunch = intent.getStringExtra("lunch");
+        dinner = intent.getStringExtra("dinner");
+
+        Search();
+
+    }
+
+    private void Search() {
+        if (searchFromMain != null) {
+            getSearchRecipeAPI(searchFromMain);
+            searchBar.setText(searchFromMain);
+            searchBar.setBackground(ContextCompat.getDrawable(Search.this, R.drawable.edit_text_search_selected));
+            searchImage.setImageResource(R.drawable.searchbar_onpng);
+        } else if (breakfast != null) {
+            getSearchRecipeAPI(breakfast);
+            searchBar.setText(breakfast);
+            searchBar.setBackground(ContextCompat.getDrawable(Search.this, R.drawable.edit_text_search_selected));
+            searchImage.setImageResource(R.drawable.searchbar_onpng);
+        } else if (lunch != null) {
+            getSearchRecipeAPI(lunch);
+            searchBar.setText(lunch);
+            searchBar.setBackground(ContextCompat.getDrawable(Search.this, R.drawable.edit_text_search_selected));
+            searchImage.setImageResource(R.drawable.searchbar_onpng);
+        } else if (dinner != null) {
+            getSearchRecipeAPI(dinner);
+            searchBar.setText(dinner);
+            searchBar.setBackground(ContextCompat.getDrawable(Search.this, R.drawable.edit_text_search_selected));
+            searchImage.setImageResource(R.drawable.searchbar_onpng);
+        } else if (searchFromMain == null && breakfast == null && lunch == null && dinner == null)
+            createRandomRecipeAPI();
     }
 
     // Method to update search results based on user input
     public void updateSearch(View view) {
 
         listSearch.clear();
-        Log.d(TAG, "onCreate: " + search);
         getSearchRecipeAPI(searchBar.getText().toString().trim());
     }
 
     private void getSearchRecipeAPI(String recipe) {
-
-        Log.d(TAG, "getSearchRecipeAPI: " + recipe);
 
         String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch?query=" + recipe + "&number=5";
 
@@ -326,7 +359,5 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-
-
     }
 }

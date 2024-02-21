@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -53,14 +55,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Declare UI elements
     public Button button;
-    public ImageView notificationImage, searchImage,profileImage, favoritesImage;
+    public ImageView notificationImage, searchImage,profileImage, favoritesImage, searchIcon;
     public EditText searchBar;
     private static final String TAG = "raz";
     private BottomNavigationView bottomNavigationView;
     RecyclerView highRaitingRecyclerView,recommendedRecipesRecyclerView;
     ImageButton ibHeart;
 
-    // Firebase authentication and user information
+    // Firebase authentication and user informati1on
     FirebaseAuth mAuth;
     public String uID;
     FirebaseUser currentUser;
@@ -155,6 +157,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         });
 
+        CoordinatorLayout.LayoutParams layoutParams= ((CoordinatorLayout.LayoutParams)
+                bottomNavigationView.getLayoutParams());
+        layoutParams.setBehavior(new BottomNavigationViewBehavior());
+
+//        bottomNavigationView.clearAnimation();
+//        bottomNavigationView.animate().translationY(bottomNavigationView.getHeight()).setDuration(200);
+
         // Retrieve user data from Firebase Realtime Database
         retrieveData();
 
@@ -204,9 +213,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
                                                 HighRaitingRecipesItem tempHighRatingRecipesItem = new HighRaitingRecipesItem(title, imageURL, id, isFavourite);
-                                                Log.d(TAG, title);
-                                                Log.d(TAG, id);
-                                                Log.d(TAG, imageURL);
 
                                                 listRecommendedRecipes.add(tempHighRatingRecipesItem);
 
@@ -220,7 +226,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                 }
 
                                                 String temp = String.valueOf(listRecommendedRecipes.get(0).isFavourite() + " " + listRecommendedRecipes.get(0).getId());
-                                                Log.d(TAG, temp);
 
 
                                             }
@@ -271,7 +276,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         //checking if favourites list is null
                         if (task.getResult().getValue() != null) {
                             favourites = Arrays.asList(task.getResult().getValue().toString().split(","));
-                            Log.d(TAG, "onComplete: " + favourites.toString());
                         }
                         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -296,32 +300,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
                                                 HighRaitingRecipesItem tempHighRatingRecipesItem = new HighRaitingRecipesItem(title, imageURL, id, isFavourite);
-                                                Log.d(TAG, title);
-                                                Log.d(TAG, id);
-                                                Log.d(TAG, imageURL);
+
 
                                                 listHighRating.add(tempHighRatingRecipesItem);
-                                                Log.d(TAG, "onResponse: " + listRecommendedRecipes);
 
                                                 //compare ids and checking that favorits are on the recommended list
                                                 for (int j = 0; j < listRecommendedRecipes.size(); j++) {
                                                     for (int x = 0; x < favourites.size(); x++) {
                                                         if (listRecommendedRecipes.get(j).getId().equals(favourites.get(x))) {
-                                                            Log.d(TAG, "onResponse: 5656565");
                                                             listRecommendedRecipes.get(j).setFavourite(true);
                                                         }
                                                     }
-                                                    Log.d(TAG, "onResponse: " + listRecommendedRecipes.get(j).toString());
                                                 }
 
                                                 String temp = String.valueOf(listRecommendedRecipes.get(0).isFavourite() + " " + listRecommendedRecipes.get(0).getId());
-                                                Log.d(TAG, temp);
 
 
-                                                Log.d(TAG, "onResponse: 11");
 
                                             }
-                                            Log.d(TAG, "onResponse: 444" + listHighRating.toString());
                                             highRaitingRecyclerView.setLayoutManager(linearLayoutManagerHorizontal);
                                             highRaitingRecyclerView.setAdapter(new HighRaitingRecipesAdapter(getApplicationContext(), listHighRating));
 
@@ -376,6 +372,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+    // Method to update search results based on user input
+    public void updateSearch(View view)  {
+
+        Intent intent = new Intent(this, Search.class);
+
+        intent.putExtra("search" ,searchBar.getText().toString().trim());
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        Toast.makeText(getApplicationContext(),"search:  " + searchBar.getText().toString().trim(),Toast.LENGTH_SHORT).show();
+    }
+
+    //make categories work
+    public void breakfast(View view) {
+
+        Intent intent = new Intent(this, Search.class);
+
+        intent.putExtra("breakfast" ,"breakfast");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        Toast.makeText(getApplicationContext(),"breakfast",Toast.LENGTH_SHORT).show();
+    }
+
+    public void lunch(View view) {
+
+        Intent intent = new Intent(this, Search.class);
+
+        intent.putExtra("lunch" ,"lunch");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        Toast.makeText(getApplicationContext(),"lunch",Toast.LENGTH_SHORT).show();
+    }
+
+    public void dinner(View view) {
+
+        Intent intent = new Intent(this, Search.class);
+
+        intent.putExtra("dinner" ,"dinner");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        Toast.makeText(getApplicationContext(),"dinner",Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     public void onClick(View view) {
@@ -398,12 +435,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-        Log.d(TAG, "onNavigationItemSelected: " + item.getItemId());
-
         return false;
     }
+    public class BottomNavigationViewBehavior extends CoordinatorLayout.Behavior<BottomNavigationView> {
+
+        private int height;
+
+        @Override
+        public boolean onLayoutChild(CoordinatorLayout parent, BottomNavigationView child, int layoutDirection) {
+            height = child.getHeight();
+            return super.onLayoutChild(parent, child, layoutDirection);
+        }
+
+        @Override
+        public boolean onStartNestedScroll(@NonNull CoordinatorLayout coordinatorLayout,
+                                           BottomNavigationView child, @NonNull
+                                           View directTargetChild, @NonNull View target,
+                                           int axes, int type)
+        {
+            return axes == ViewCompat.SCROLL_AXIS_VERTICAL;
+        }
+
+        @Override
+        public void onNestedScroll(@NonNull CoordinatorLayout coordinatorLayout, @NonNull BottomNavigationView child,
+                                   @NonNull View target, int dxConsumed, int dyConsumed,
+                                   int dxUnconsumed, int dyUnconsumed,
+                                   @ViewCompat.NestedScrollType int type)
+        {
+            if (dyConsumed > 0) {
+                slideDown(child);
+            } else if (dyConsumed < 0) {
+                slideUp(child);
+            }
+        }
+
+        private void slideUp(BottomNavigationView child) {
+            child.clearAnimation();
+            child.animate().translationY(0).setDuration(200);
+        }
+
+        private void slideDown(BottomNavigationView child) {
+            child.clearAnimation();
+            child.animate().translationY(height).setDuration(200);
+        }
+    }
+
 }

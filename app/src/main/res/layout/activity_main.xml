@@ -11,10 +11,25 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavBar"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_alignParentBottom="true"
+            app:menu="@menu/bottom_nav_menu"
+            android:isScrollContainer="false"
+            app:itemIconSize="30dp"
+            app:labelVisibilityMode="unlabeled"
+            android:layout_gravity="bottom"
+            app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
+            android:background="@drawable/nav_background"/>
+
 
     <ScrollView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        >
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -61,14 +76,12 @@
         android:layout_marginTop="0dp"
         android:layout_marginRight="30dp"
         android:layout_marginBottom="-85dp"
-        android:imeOptions="actionNext"
+        android:imeOptions="actionSearch"
         android:background="@drawable/edit_text_search"
-
-
         android:ems="10"
         android:fontFamily="@font/urbanist_medium"
         android:hint="What are you looking for?"
-        android:paddingLeft="55dp"
+        android:paddingLeft="20dp"
         android:paddingTop="8dp"
         android:paddingRight="20dp"
         android:paddingBottom="8dp"
@@ -81,8 +94,9 @@
         android:layout_width="33dp"
         android:layout_height="30dp"
         android:layout_below="@id/emptyProfile"
-        android:layout_marginLeft="30dp"
+        android:layout_marginLeft="340dp"
         android:layout_marginTop="42dp"
+        android:onClick="updateSearch"
         app:srcCompat="@drawable/search_icon2"></ImageView>
 
     <TextView
@@ -133,6 +147,7 @@
                 android:gravity="left"
                 android:text="Breakfast"
                 android:textAllCaps="false"
+                android:onClick="breakfast"
                 android:textColor="#393939"></Button>
 
             <Button
@@ -148,6 +163,7 @@
                 android:fontFamily="@font/urbanist_medium"
                 android:gravity="left"
                 android:text="Lunch"
+                android:onClick="lunch"
                 android:textAllCaps="false"
                 android:textColor="#393939"></Button>
 
@@ -161,6 +177,7 @@
                 android:fontFamily="@font/urbanist_medium"
                 android:gravity="left"
                 android:textAllCaps="false"
+                android:onClick="dinner"
                 android:drawableRight="@drawable/dinner_logo"
                 android:drawablePadding="-70dp"></Button>
         </LinearLayout>
@@ -238,6 +255,7 @@
             android:layout_below="@id/SeeAllRecommended"
             android:layout_marginTop="25dp"
             android:layout_marginHorizontal="20dp"
+            app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
             android:overScrollMode="never"
             android:scrollbars="vertical"/>
 
@@ -247,20 +265,8 @@
     </ScrollView>
         
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavBar"
-        android:layout_width="match_parent"
-        android:layout_height="90dp"
-        android:layout_alignParentBottom="true"
-        app:menu="@menu/bottom_nav_menu"
-        android:isScrollContainer="false"
-        app:itemIconSize="30dp"
-        app:labelVisibilityMode="unlabeled"
-        android:layout_gravity="bottom"
-        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
-        app:layout_scrollFlags="scroll|enterAlways|snap"
-        android:background="@drawable/nav_background"/>
-]
+
+
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

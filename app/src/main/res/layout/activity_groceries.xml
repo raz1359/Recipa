@@ -42,6 +42,13 @@
         android:textColor="#434343"
         android:textSize="20dp"></TextView>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/shopingListRV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="80dp"
+        android:paddingHorizontal="22dp"
+        />
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

@@ -1,16 +1,28 @@
 // Import statements
 package com.example.myapplication;
 
-import androidx.activity.result.ActivityResultCallback;
+import static android.nfc.NdefRecord.createUri;
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
+import androidx.activity.result.ActivityResult;
+import  androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 
+import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,24 +48,31 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 
+import org.checkerframework.checker.units.qual.A;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Calendar;
 import java.util.UUID;
 
 public class FillProfile extends AppCompatActivity implements View.OnClickListener {
 
     // Declare UI elements
     private static final String TAG = "raz";
-     Button btnContinue;
+    Button btnContinue,btnGalley,btnCamera;
     ImageButton btnSignOut;
     public ImageView backArrow, profilePic;
     public Uri imageUri;
     public EditText etFullName, etNickname;
-    public String uID, url;
+    public String uID, url, mCurrentPhotoPath;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
     FirebaseStorage storage;
     StorageReference storageReference;
     public Profile profile;
     ActivityResultLauncher<String> arlGallery;
+    ActivityResultLauncher<Intent> arlCamera;
 
 
 
@@ -67,6 +86,9 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         // Initialize UI elements
         backArrow = findViewById(R.id.ivbackProfile);
         backArrow.setOnClickListener(this);
+
+        btnGalley = findViewById(R.id.galleyBT);
+        btnCamera = findViewById(R.id.cameraBT);
 
         etFullName = findViewById(R.id.etfullName);
         etFullName.setOnClickListener(this);
@@ -97,37 +119,65 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onActivityResult(Uri result) {
                 if (result != null) {
-                    Log.d(TAG, "onActivityResult: I am back from Gallery");
                     imageUri = result;
                     Picasso.get().load(result).resize(470, 470).centerCrop().noFade().into(profilePic);
                     uploadPicture();
                 }
-
             }
         });
 
-        // Set onClickListener for profile picture selection
-        profilePic.setOnClickListener(new View.OnClickListener() {
+        arlCamera = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult() ,
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult( ActivityResult result ) {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                            Bundle bundle = result.getData().getExtras();
+                            Bitmap bitmap =(Bitmap) bundle.get("data");
+                            Picasso.get().load(getImageUri(getApplicationContext(), bitmap))
+                                    .resize(470, 470).centerCrop().noFade().into(profilePic);
+                            Log.d(TAG , "onActivityResult: " + getImageUri(getApplicationContext(), bitmap));
+                            imageUri = getImageUri(getApplicationContext(), bitmap);
+                            uploadPicture();
+
+                        }
+                    }
+                }
+        );
+
+                // Set onClickListener for profile picture selection
+                btnGalley.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick( View view ) {
+                        arlGallery.launch("image/*");
+                    }
+                });
+
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.CAMERA,
+                Manifest.permission.READ_CALENDAR}, 100);
+
+        btnCamera.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                choosePicture();
-                arlGallery.launch("image/*");
-
+            public void onClick( View view ) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                arlCamera.launch(intent);
             }
-
         });
-
 
         // Retrieve data from Firebase
         retrieveDate();
     }
-    // Method to choose a picture from the gallery
-    private void choosePicture() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-
+    public Uri getImageUri( Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage
+                (inContext.getContentResolver(), inImage, "Title", null);
+        Log.d(TAG , "getImageUri: " + path);
+        return Uri.parse(path);
     }
+
+
 
     // Method to upload the selected picture to Firebase Storage
     private void uploadPicture() {
@@ -150,7 +200,6 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
                             @Override
                             public void onSuccess(Uri uri) {
                                 imageUri = uri;
-                                Log.d(TAG, "onSuccess: download uri: = " + uri.toString());
                                 Picasso.get().load(uri).resize(370,370).centerCrop().into(profilePic);
                                 url = imageUri.toString();
                                 datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).child("ProfileImage").setValue(uri.toString());
