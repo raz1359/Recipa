@@ -11,9 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/groceries_empty"
-
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
       />
 
     <TextView
@@ -47,7 +46,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="80dp"
-        android:paddingHorizontal="22dp"
+        android:paddingHorizontal="29dp"
+        />
+
+    <ImageView
+        android:id="@+id/deleteShoppingCart"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/delete_shopping_cart"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="350dp"
         />
 
 

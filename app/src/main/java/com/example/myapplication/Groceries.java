@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,18 +26,24 @@ import java.util.List;
 
 public class Groceries extends AppCompatActivity {
 
+
+    // UI Elements
     RecyclerView shoppingListRv;
     LinearLayoutManager linearLayoutManagerVertical;
-    List <Ingredient> shoppingList = new ArrayList<>();
-    private BottomNavigationView bottomNavigationView;
+    ImageView deleteShoppingList;
+    BottomNavigationView bottomNavigationView;
 
+    // Firebase
     DatabaseReference dbReferenceShoppingList;
     FirebaseAuth mAuth;
     String uID;
     FirebaseUser currentUser;
 
-    private static final String TAG = "raz";
+    // Data
+    List<Ingredient> shoppingList = new ArrayList<>();
 
+    // Tag for logging
+    private static final String TAG = "raz";
 
 
     @Override
@@ -49,54 +56,55 @@ public class Groceries extends AppCompatActivity {
         currentUser = mAuth.getCurrentUser(); //get current user
         uID = currentUser.getUid(); // get current user unique ID
 
+        // Initialize UI elements
         linearLayoutManagerVertical = new LinearLayoutManager(this);
         linearLayoutManagerVertical.setOrientation(LinearLayoutManager.VERTICAL);
-
         shoppingListRv = findViewById(R.id.shopingListRV);
+        deleteShoppingList = findViewById(R.id.deleteShoppingCart);
 
+        // Firebase reference to the shopping list
         dbReferenceShoppingList = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/")
                 .child("users")
                 .child(uID)
                 .child("shoppingList");
 
 
-        if (shoppingList == null) {
-            findViewById(R.id.tvDescription).setAlpha(1);
-            findViewById(R.id.tvEmpty).setAlpha(1);
-            findViewById(R.id.lady_empty).setAlpha(1);
-            shoppingListRv.setAlpha(0);
-
-        } else {
-            findViewById(R.id.tvDescription).setAlpha(0);
-            findViewById(R.id.tvEmpty).setAlpha(0);
-            findViewById(R.id.lady_empty).setAlpha(0);
-            shoppingListRv.setAlpha(1);
-
-            shoppingListRv.setLayoutManager(linearLayoutManagerVertical);
-            shoppingListRv.setAdapter(new ShoppingListAdapter(getApplicationContext(),shoppingList));
-        }
-
+        // Retrieve shopping list data from Firebase
         dbReferenceShoppingList.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange( @NonNull DataSnapshot snapshot ) {
                 for (DataSnapshot childSnapshot : snapshot.getChildren()) {
                     String name = childSnapshot.getKey();
-                    boolean isChecked = (boolean) childSnapshot.child("checked").getValue();
+                    boolean isChecked = Boolean.parseBoolean(childSnapshot.child("checked").getValue().toString());
                     int amount = Integer.parseInt(childSnapshot.child("amount").getValue().toString());
 
-                    Ingredient ingredient = new Ingredient(name,isChecked,amount);
-                    Log.d(TAG , "onDataChange: " + childSnapshot + "  " + ingredient);
+                    Ingredient ingredient = new Ingredient(name , isChecked , amount);
                     shoppingList.add(ingredient);
                 }
+                // Show or hide elements based on shopping list data
+                updateUI();
             }
-
             @Override
             public void onCancelled( @NonNull DatabaseError error ) {
-
+                // Handle database error
             }
         });
 
+        // Delete shopping list onClick
+        deleteShoppingList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick( View view ) {
+                // Clear shopping list in Firebase
+                dbReferenceShoppingList.setValue(null);
+                shoppingList.clear();
+
+                // Update UI
+                updateUI();
+            }
+        });
+
+        // Bottom navigation setup
         bottomNavigationView = findViewById(R.id.bottomNavBar);
         bottomNavigationView.setSelectedItemId(R.id.shoppingBT);
 
@@ -106,22 +114,36 @@ public class Groceries extends AppCompatActivity {
                     return true;
 
                 case R.id.searchBT:
-                    //startActivity(new Intent(getApplicationContext(), Search.class));
+                    // Open search activity
                     Intent intent = new Intent(this, Search.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivityForResult(intent,0);
                     finish();
                     return true;
                 case R.id.homeBT:
+                    // Open main activity
                     Intent intent1 = new Intent(this, MainActivity.class);
                     intent1.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivityForResult(intent1,0);
                     finish();
                     return true;
-
             }
             return false;
         });
 
+    }
+
+    // Update UI elements based on shopping list data
+    private void updateUI() {
+        findViewById(R.id.tvDescription).setAlpha(shoppingList.isEmpty() ? 1 : 0);
+        findViewById(R.id.tvEmpty).setAlpha(shoppingList.isEmpty() ? 1 : 0);
+        findViewById(R.id.lady_empty).setAlpha(shoppingList.isEmpty() ? 1 : 0);
+        findViewById(R.id.deleteShoppingCart).setAlpha(shoppingList.isEmpty() ? 0 : 1);
+        shoppingListRv.setAlpha(shoppingList.isEmpty() ? 0 : 1);
+
+        if (!shoppingList.isEmpty()) {
+            shoppingListRv.setLayoutManager(linearLayoutManagerVertical);
+            shoppingListRv.setAdapter(new ShoppingListAdapter(getApplicationContext(), shoppingList));
+        }
     }
 }

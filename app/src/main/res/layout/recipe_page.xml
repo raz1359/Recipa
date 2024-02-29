@@ -102,6 +102,18 @@
         android:layout_alignTop="@id/description"
         android:layout_marginLeft="320dp"/>
 
+        <ImageButton
+            android:id="@+id/pauseIcon"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:src="@drawable/pause_icon"
+            android:clickable="true"
+            android:scaleType="fitXY"
+            android:background="@null"
+            android:layout_alignTop="@id/description"
+            android:layout_marginLeft="260dp"/>
+
+
 
     <TextView
         android:id="@+id/desc_tv"

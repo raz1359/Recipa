@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent">
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:paddingVertical="10dp">
 
 	<CheckBox
 		android:id="@+id/checked"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"/>
+		android:layout_height="wrap_content"
+		android:scaleX="1.5"
+		android:scaleY="1.5"
+		android:theme="@style/checkBox"
+		/>
+
 	<TextView
 		android:id="@+id/ingredientNameShoppingList"
 		android:layout_width="wrap_content"
@@ -15,19 +21,19 @@
 		android:textSize="14dp"
 		android:fontFamily="@font/urbanist_medium"
 		android:textColor="#272727"
-		android:layout_alignRight="@id/checked"
-		android:layout_marginLeft="30dp"
+		android:layout_alignLeft="@id/checked"
+		android:layout_marginLeft="40dp"
 		android:layout_marginTop="7dp"/>
 	<TextView
 		android:id="@+id/amountTv"
-		android:layout_width="wrap_content"
+		android:layout_width="70dp"
 		android:layout_height="wrap_content"
 
 		android:textSize="14dp"
 		android:fontFamily="@font/urbanist_medium"
 		android:textColor="#272727"
-		android:layout_alignRight="@id/ingredientNameShoppingList"
-		android:layout_marginLeft="35dp"
+		android:layout_alignLeft="@id/ingredientNameShoppingList"
+		android:layout_marginLeft="290dp"
 		android:layout_marginTop="7dp"/>
 
 

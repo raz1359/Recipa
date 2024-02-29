@@ -58,7 +58,7 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
     // Declare variables for UI elements and functionality
     private String TAG = "raz", recipeTitle;
     private TextView descTv, recipeTitleTv, ingredientNumber, addToCartBtn;
-    private ImageView recipeIv, likeIv, ivBack, ivShoppingCart, ivFavorites, ivTextToSpeech ;
+    private ImageView recipeIv, likeIv, ivBack, ivShoppingCart, ivFavorites, ivTextToSpeech, ivPause;
     private String id, desc;
     boolean isFavorite = true;
     Button minus , plus;
@@ -134,6 +134,7 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
         minus = findViewById(R.id.minus);
         addToCartBtn = findViewById(R.id.addToCart);
         plus = findViewById(R.id.plus);
+        ivPause = findViewById(R.id.pauseIcon);
 
         linearLayoutHorizontal = new LinearLayoutManager(this);
         linearLayoutHorizontal.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -231,6 +232,13 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
             public void onClick(View view) {
                 Log.d(TAG, "onClick: " + Jsoup.parse(desc).text());
                 t1.speak(Jsoup.parse(desc).text(), TextToSpeech.QUEUE_FLUSH, null);
+            }
+        });
+
+        ivPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick( View view ) {
+                t1.stop();
             }
         });
 

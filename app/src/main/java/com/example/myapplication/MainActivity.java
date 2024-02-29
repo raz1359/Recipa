@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     RecyclerView highRaitingRecyclerView,recommendedRecipesRecyclerView;
     ImageButton ibHeart;
 
-    // Firebase authentication and user informati1on
+    // Firebase authentication and user information1on
     FirebaseAuth mAuth;
     public String uID;
     FirebaseUser currentUser;
