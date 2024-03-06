@@ -19,6 +19,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -50,22 +51,29 @@ import com.squareup.picasso.Picasso;
 
 import org.checkerframework.checker.units.qual.A;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Calendar;
+import java.util.Map;
 import java.util.UUID;
 
 public class FillProfile extends AppCompatActivity implements View.OnClickListener {
 
     // Declare UI elements
     private static final String TAG = "raz";
-    Button btnContinue,btnGalley,btnCamera;
+    Button btnContinue;
     ImageButton btnSignOut;
     public ImageView backArrow, profilePic;
+
+    ImageButton IBGalley,IBCamera;
+
+    File file;
     public Uri imageUri;
     public EditText etFullName, etNickname;
-    public String uID, url, mCurrentPhotoPath;
+    public String uID, url, mCurrentPhotoPath, filePath;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
     FirebaseStorage storage;
@@ -83,12 +91,18 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fill_profile);
 
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.CAMERA,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_CALENDAR}, 100);
+
         // Initialize UI elements
         backArrow = findViewById(R.id.ivbackProfile);
         backArrow.setOnClickListener(this);
 
-        btnGalley = findViewById(R.id.galleyBT);
-        btnCamera = findViewById(R.id.cameraBT);
+        IBGalley = findViewById(R.id.galleyIB);
+        IBCamera = findViewById(R.id.cameraIB);
 
         etFullName = findViewById(R.id.etfullName);
         etFullName.setOnClickListener(this);
@@ -131,36 +145,51 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult( ActivityResult result ) {
-                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                            Bundle bundle = result.getData().getExtras();
-                            Bitmap bitmap =(Bitmap) bundle.get("data");
-                            Picasso.get().load(getImageUri(getApplicationContext(), bitmap))
-                                    .resize(470, 470).centerCrop().noFade().into(profilePic);
-                            Log.d(TAG , "onActivityResult: " + getImageUri(getApplicationContext(), bitmap));
-                            imageUri = getImageUri(getApplicationContext(), bitmap);
-                            uploadPicture();
+                        if (result.getResultCode() == RESULT_OK) {
+                            Log.d(TAG , "onActivityResult: asd");
+                            InputStream inputStream = null;
+                            try {
+                                Log.d(TAG , "onActivityResult: 1`11");
+                                inputStream = getApplicationContext().getContentResolver().openInputStream(imageUri);
+                                inputStream = new BufferedInputStream(inputStream);
+                                Picasso.get().load(imageUri)
+                                        .resize(470, 470).centerCrop().noFade().into(profilePic);
+                                uploadPicture();
+                            } catch (Exception e) {
 
+                                throw  new RuntimeException(e);
+                            }
                         }
                     }
                 }
         );
 
                 // Set onClickListener for profile picture selection
-                btnGalley.setOnClickListener(new View.OnClickListener() {
+                IBGalley.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick( View view ) {
                         arlGallery.launch("image/*");
                     }
                 });
 
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.CAMERA,
-                Manifest.permission.READ_CALENDAR}, 100);
 
-        btnCamera.setOnClickListener(new View.OnClickListener() {
+
+        IBCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick( View view ) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                try {
+                    file = createImageFile();
+
+                } catch (IOException e) {
+
+                    throw  new RuntimeException(e);
+                }
+
+                filePath = "com.example.myapplication.fileprovider";
+                imageUri = FileProvider.getUriForFile(getApplicationContext(), filePath , file);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 arlCamera.launch(intent);
             }
         });
@@ -168,7 +197,10 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         // Retrieve data from Firebase
         retrieveDate();
     }
+
+
     public Uri getImageUri( Context inContext, Bitmap inImage) {
+        Log.d(TAG , "InImage: " + inImage);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
         String path = MediaStore.Images.Media.insertImage
@@ -177,9 +209,28 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
         return Uri.parse(path);
     }
 
+    private File createImageFile() throws IOException {
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int houre = c.get(Calendar.HOUR_OF_DAY);
+        int min = c.get(Calendar.MINUTE);
+        int sec = c.get(Calendar.SECOND);
+        String timeStamp = "" + day + "" + month + "" + year + "" + houre + "" + min + "_" + sec;
+        String imageFileName = "Recipa " + timeStamp;
+        File storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName , //ההתחלה של שם הקובץ prifix
+                ".jpg" , // סיומת סוג הקובץ של התמונה suffix
+                storageDirectory // מיקום התיקייה של האחסון
+        );
 
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
 
-    // Method to upload the selected picture to Firebase Storage
+        // Method to upload the selected picture to Firebase Storage
     private void uploadPicture() {
 
         final ProgressDialog pd = new ProgressDialog(this);
@@ -199,12 +250,13 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
                         riverRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                imageUri = uri;
-                                Picasso.get().load(uri).resize(370,370).centerCrop().into(profilePic);
+//                                imageUri = uri.get().load(uri).resize(370,370).centerCrop().into(profilePic);
+//                                profilePic.setImageBitmap(imageUri);
                                 url = imageUri.toString();
                                 datebaseReference.child("users").child(mAuth.getCurrentUser().getUid()).child("ProfileImage").setValue(uri.toString());
                             }
                         });
+
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -277,5 +329,6 @@ public class FillProfile extends AppCompatActivity implements View.OnClickListen
 
         }
     }
+
 
 }

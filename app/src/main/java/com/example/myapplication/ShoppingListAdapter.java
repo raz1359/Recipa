@@ -60,9 +60,10 @@ public class ShoppingListAdapter extends RecyclerView.Adapter <shoppingListRvHol
         String tempName = ingredient.getName();
 
         // Bind data to ViewHolder
-        holder.name.setText(ingredient.getName());
+        //holder.name.setText(ingredient.getName());
         holder.amount.setText("X" + ingredient.getAmount());
         holder.isChecked.setChecked(ingredient.isChecked());
+        holder.isChecked.setText(ingredient.getName());
 
 
         // Checkbox listener to update checked status in Firebase

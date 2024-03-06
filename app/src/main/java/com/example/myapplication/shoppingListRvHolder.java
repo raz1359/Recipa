@@ -15,7 +15,7 @@ public class shoppingListRvHolder extends RecyclerView.ViewHolder {
         super(itemView);
 
         isChecked = itemView.findViewById(R.id.checked);
-        name = itemView.findViewById(R.id.ingredientNameShoppingList);
+      //  name = itemView.findViewById(R.id.ingredientNameShoppingList);
         amount = itemView.findViewById(R.id.amountTv);
     }
 }

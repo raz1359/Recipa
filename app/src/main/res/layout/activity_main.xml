@@ -77,6 +77,7 @@
         android:layout_marginRight="30dp"
         android:layout_marginBottom="-85dp"
         android:imeOptions="actionSearch"
+        android:singleLine="true"
         android:background="@drawable/edit_text_search"
         android:ems="10"
         android:fontFamily="@font/urbanist_medium"
@@ -87,7 +88,7 @@
         android:paddingBottom="8dp"
         android:textColor="@color/black"
         android:textColorHint="#A3A3A3"
-        android:textSize="15dp"></EditText>
+        android:textSize="15dp"/>
 
     <ImageView
         android:id="@+id/searchIcon"
@@ -96,8 +97,7 @@
         android:layout_below="@id/emptyProfile"
         android:layout_marginLeft="340dp"
         android:layout_marginTop="42dp"
-        android:onClick="updateSearch"
-        app:srcCompat="@drawable/search_icon2"></ImageView>
+        app:srcCompat="@drawable/search_icon2"/>
 
     <TextView
         android:id="@+id/tvCategories"
@@ -111,9 +111,7 @@
         android:textSize="22dp"
         android:textStyle="bold"
         android:fontFamily="@font/urbanist_medium"
-        android:textColor="#272727"
-        ></TextView>
-
+        android:textColor="#272727"/>
 
     <HorizontalScrollView
         android:id="@+id/hsvCate"
@@ -122,8 +120,7 @@
         android:layout_below="@id/tvCategories"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
-        android:scrollbars="none"
-        >
+        android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -148,7 +145,7 @@
                 android:text="Breakfast"
                 android:textAllCaps="false"
                 android:onClick="breakfast"
-                android:textColor="#393939"></Button>
+                android:textColor="#393939"/>
 
             <Button
                 android:layout_width="150dp"
@@ -165,7 +162,7 @@
                 android:text="Lunch"
                 android:onClick="lunch"
                 android:textAllCaps="false"
-                android:textColor="#393939"></Button>
+                android:textColor="#393939"/>
 
             <Button
                 android:layout_width="150dp"
@@ -179,7 +176,7 @@
                 android:textAllCaps="false"
                 android:onClick="dinner"
                 android:drawableRight="@drawable/dinner_logo"
-                android:drawablePadding="-70dp"></Button>
+                android:drawablePadding="-70dp"/>
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -194,8 +191,7 @@
         android:textSize="22dp"
         android:textStyle="bold"
         android:fontFamily="@font/urbanist_medium"
-        android:textColor="#272727"
-        ></TextView>
+        android:textColor="#272727" />
 
     <TextView
         android:id="@+id/SeeAllHighRating"
@@ -208,8 +204,7 @@
         android:textStyle="bold"
         android:fontFamily="@font/urbanist_medium"
         android:textColor="#1BAC4B"
-        android:text="See All"
-        ></TextView>
+        android:text="See All" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclViewHighRating"
@@ -219,8 +214,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginHorizontal="20dp"
         android:overScrollMode="never"
-        android:scrollbars="horizontal">
-    </androidx.recyclerview.widget.RecyclerView>
+        android:scrollbars="horizontal"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -245,8 +239,7 @@
             android:textStyle="bold"
             android:fontFamily="@font/urbanist_medium"
             android:textColor="#1BAC4B"
-            android:text="See All"
-            ></TextView>
+            android:text="See All"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewRecommendedRecipes"

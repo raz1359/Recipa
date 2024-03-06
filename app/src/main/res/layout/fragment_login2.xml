@@ -8,6 +8,7 @@
 
     <!-- TODO: Update blank fragment layout -->
 
+
     <ImageView
         android:id="@+id/imageView11"
         android:layout_width="wrap_content"
@@ -19,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/imageView11"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="30dp"
         android:id="@+id/rl1">
 
 
@@ -117,6 +118,8 @@
             android:layout_marginTop="136dp"
 
             />
+
+
 
 
     </RelativeLayout>

@@ -12,13 +12,16 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -132,6 +135,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction( TextView textView , int i , KeyEvent keyEvent ) {
+
+                if (i == EditorInfo.IME_ACTION_SEARCH) {
+                    Intent intent = new Intent(getApplicationContext(), Search.class);
+
+                    intent.putExtra("search" ,searchBar.getText().toString().trim());
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    return true;
+                }
+               return false;
+            }
+        });
+
         // Bottom navigation item selection listener
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()){
@@ -160,9 +179,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         CoordinatorLayout.LayoutParams layoutParams= ((CoordinatorLayout.LayoutParams)
                 bottomNavigationView.getLayoutParams());
         layoutParams.setBehavior(new BottomNavigationViewBehavior());
-
-//        bottomNavigationView.clearAnimation();
-//        bottomNavigationView.animate().translationY(bottomNavigationView.getHeight()).setDuration(200);
 
         // Retrieve user data from Firebase Realtime Database
         retrieveData();
@@ -372,17 +388,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    // Method to update search results based on user input
-    public void updateSearch(View view)  {
-
-        Intent intent = new Intent(this, Search.class);
-
-        intent.putExtra("search" ,searchBar.getText().toString().trim());
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        Toast.makeText(getApplicationContext(),"search:  " + searchBar.getText().toString().trim(),Toast.LENGTH_SHORT).show();
-    }
-
     //make categories work
     public void breakfast(View view) {
 
@@ -391,7 +396,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("breakfast" ,"breakfast");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-        Toast.makeText(getApplicationContext(),"breakfast",Toast.LENGTH_SHORT).show();
     }
 
     public void lunch(View view) {
@@ -401,7 +405,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("lunch" ,"lunch");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-        Toast.makeText(getApplicationContext(),"lunch",Toast.LENGTH_SHORT).show();
     }
 
     public void dinner(View view) {
@@ -411,7 +414,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("dinner" ,"dinner");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-        Toast.makeText(getApplicationContext(),"dinner",Toast.LENGTH_SHORT).show();
     }
 
     @Override

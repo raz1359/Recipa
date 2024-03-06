@@ -12,8 +12,10 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -68,7 +70,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
     DatabaseReference datebaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://recipa-e3b07-default-rtdb.europe-west1.firebasedatabase.app/");
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
@@ -77,13 +79,13 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
         searchBar = findViewById(R.id.search_bar2);
         searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onFocusChange(View view, boolean hasFocus) {
+            public void onFocusChange( View view , boolean hasFocus ) {
                 // Change background and icon based on focus
                 if (hasFocus) {
-                    searchBar.setBackground(ContextCompat.getDrawable(Search.this, R.drawable.edit_text_search_selected));
+                    searchBar.setBackground(ContextCompat.getDrawable(Search.this , R.drawable.edit_text_search_selected));
                     searchImage.setImageResource(R.drawable.searchbar_onpng);
                 } else {
-                    searchBar.setBackground(ContextCompat.getDrawable(Search.this, R.drawable.edit_text_search));
+                    searchBar.setBackground(ContextCompat.getDrawable(Search.this , R.drawable.edit_text_search));
                     searchImage.setImageResource(R.drawable.search_icon2);
                 }
             }
@@ -94,21 +96,21 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
         bottomNavigationView.setSelectedItemId(R.id.searchBT);
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            switch (item.getItemId()){
+            switch (item.getItemId()) {
                 case R.id.searchBT:
                     return true;
 
                 case R.id.shoppingBT:
                     //startActivity(new Intent(getApplicationContext(), Search.class));
-                    Intent intent = new Intent(this, Groceries.class);
+                    Intent intent = new Intent(this , Groceries.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    startActivityForResult(intent,0);
+                    startActivityForResult(intent , 0);
                     finish();
                     return true;
                 case R.id.homeBT:
-                    Intent intent1 = new Intent(this, MainActivity.class);
+                    Intent intent1 = new Intent(this , MainActivity.class);
                     intent1.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    startActivityForResult(intent1,0);
+                    startActivityForResult(intent1 , 0);
                     finish();
                     return true;
 
@@ -126,7 +128,6 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
         // Get searched recipe from MainActivity
         Intent intent = getIntent();
         searchFromMain = intent.getStringExtra("search");
-        Log.d(TAG, "onCreate search: " + searchFromMain);
 
         // Get categories from MainActivity
         breakfast = intent.getStringExtra("breakfast");
@@ -135,43 +136,48 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
 
         Search();
 
+        searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction( TextView textView , int i , KeyEvent keyEvent ) {
+                if (i == EditorInfo.IME_ACTION_SEARCH) {
+                    listSearch.clear();
+                    getSearchRecipeAPI(searchBar.getText().toString().trim());
+                    return true;
+                }
+                return false;
+            }
+        });
+
     }
 
     private void Search() {
         if (searchFromMain != null) {
             getSearchRecipeAPI(searchFromMain);
             searchBar.setText(searchFromMain);
-            searchBar.setBackground(ContextCompat.getDrawable(Search.this, R.drawable.edit_text_search_selected));
+            searchBar.setBackground(ContextCompat.getDrawable(Search.this , R.drawable.edit_text_search_selected));
             searchImage.setImageResource(R.drawable.searchbar_onpng);
         } else if (breakfast != null) {
             getSearchRecipeAPI(breakfast);
             searchBar.setText(breakfast);
-            searchBar.setBackground(ContextCompat.getDrawable(Search.this, R.drawable.edit_text_search_selected));
+            searchBar.setBackground(ContextCompat.getDrawable(Search.this , R.drawable.edit_text_search_selected));
             searchImage.setImageResource(R.drawable.searchbar_onpng);
         } else if (lunch != null) {
             getSearchRecipeAPI(lunch);
             searchBar.setText(lunch);
-            searchBar.setBackground(ContextCompat.getDrawable(Search.this, R.drawable.edit_text_search_selected));
+            searchBar.setBackground(ContextCompat.getDrawable(Search.this , R.drawable.edit_text_search_selected));
             searchImage.setImageResource(R.drawable.searchbar_onpng);
         } else if (dinner != null) {
             getSearchRecipeAPI(dinner);
             searchBar.setText(dinner);
-            searchBar.setBackground(ContextCompat.getDrawable(Search.this, R.drawable.edit_text_search_selected));
+            searchBar.setBackground(ContextCompat.getDrawable(Search.this , R.drawable.edit_text_search_selected));
             searchImage.setImageResource(R.drawable.searchbar_onpng);
         } else if (searchFromMain == null && breakfast == null && lunch == null && dinner == null)
             createRandomRecipeAPI();
     }
 
-    // Method to update search results based on user input
-    public void updateSearch(View view) {
+    private void getSearchRecipeAPI( String recipe ) {
 
-        listSearch.clear();
-        getSearchRecipeAPI(searchBar.getText().toString().trim());
-    }
-
-    private void getSearchRecipeAPI(String recipe) {
-
-        String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch?query=" + recipe + "&number=5";
+        String url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/search?query="+ recipe +"&instructionsRequired=true&number=10&offset=0&cuisine=" + recipe + "\"";
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -179,17 +185,17 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                 .child("favourites").get()
                 .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    public void onComplete( @NonNull Task<DataSnapshot> task ) {
 
                         //checking if favourites list is null
                         if (task.getResult().getValue() != null) {
                             favourites = Arrays.asList(task.getResult().getValue().toString().split(","));
                         }
                         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                                (Request.Method.GET , url , null , new Response.Listener<JSONObject>() {
 
                                     @Override
-                                    public void onResponse(JSONObject response) {
+                                    public void onResponse( JSONObject response ) {
                                         try {
                                             JSONArray jsonArray = response.getJSONArray("results");
                                             for (int i = 0; i < jsonArray.length(); i++) {
@@ -203,13 +209,13 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                                                 boolean isFavourite = false;
 
 
-                                                Picasso.get().load(imageURL).resize(500, 500).centerCrop().noFade();
+                                                Picasso.get().load(imageURL).resize(500 , 500).centerCrop().noFade();
 
 
-                                                HighRaitingRecipesItem tempHighRatingRecipesItem = new HighRaitingRecipesItem(title, imageURL, id, isFavourite);
-                                                Log.d(TAG, title);
-                                                Log.d(TAG, id);
-                                                Log.d(TAG, imageURL);
+                                                HighRaitingRecipesItem tempHighRatingRecipesItem = new HighRaitingRecipesItem(title , imageURL , id , isFavourite);
+                                                Log.d(TAG , title);
+                                                Log.d(TAG , id);
+                                                Log.d(TAG , imageURL);
 
                                                 listSearch.add(tempHighRatingRecipesItem);
 
@@ -223,22 +229,22 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                                                 }
 
                                                 String temp = String.valueOf(listSearch.get(0).isFavourite() + " " + listSearch.get(0).getId());
-                                                Log.d(TAG, temp);
+                                                Log.d(TAG , temp);
 
 
                                             }
                                             searchRecyclerView.setLayoutManager(linearLayoutManagerVertical);
-                                            searchRecyclerView.setAdapter(new RecommendedRecipesAdapter(getApplicationContext(), listSearch));
+                                            searchRecyclerView.setAdapter(new RecommendedRecipesAdapter(getApplicationContext() , listSearch));
 
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
 
                                     }
-                                }, new Response.ErrorListener() {
+                                } , new Response.ErrorListener() {
 
                                     @Override
-                                    public void onErrorResponse(VolleyError error) {
+                                    public void onErrorResponse( VolleyError error ) {
                                         // TODO: Handle error
                                         error.printStackTrace();
                                     }
@@ -248,8 +254,8 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
 
                             public Map<String, String> getHeaders() {
                                 HashMap<String, String> headers = new HashMap<>();
-                                headers.put("X-Rapidapi-Key", "d061eda37cmshd8c99b385f1e685p177488jsn6dcbb4585857\n");
-                                headers.put("X-Rapidapi-Host", "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
+                                headers.put("X-Rapidapi-Key" , "d061eda37cmshd8c99b385f1e685p177488jsn6dcbb4585857\n");
+                                headers.put("X-Rapidapi-Host" , "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
                                 return headers;
                             }
                         };
@@ -270,17 +276,17 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                 .child("favourites").get()
                 .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    public void onComplete( @NonNull Task<DataSnapshot> task ) {
 
                         //checking if favourites list is null
                         if (task.getResult().getValue() != null) {
                             favourites = Arrays.asList(task.getResult().getValue().toString().split(","));
                         }
                         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                                (Request.Method.GET , url , null , new Response.Listener<JSONObject>() {
 
                                     @Override
-                                    public void onResponse(JSONObject response) {
+                                    public void onResponse( JSONObject response ) {
                                         try {
                                             JSONArray jsonArray = response.getJSONArray("recipes");
                                             for (int i = 0; i < jsonArray.length(); i++) {
@@ -294,13 +300,13 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                                                 boolean isFavourite = false;
 
 
-                                                Picasso.get().load(imageURL).resize(500, 500).centerCrop().noFade();
+                                                Picasso.get().load(imageURL).resize(500 , 500).centerCrop().noFade();
 
 
-                                                HighRaitingRecipesItem tempHighRatingRecipesItem = new HighRaitingRecipesItem(title, imageURL, id, isFavourite);
-                                                Log.d(TAG, title);
-                                                Log.d(TAG, id);
-                                                Log.d(TAG, imageURL);
+                                                HighRaitingRecipesItem tempHighRatingRecipesItem = new HighRaitingRecipesItem(title , imageURL , id , isFavourite);
+                                                Log.d(TAG , title);
+                                                Log.d(TAG , id);
+                                                Log.d(TAG , imageURL);
 
                                                 listSearch.add(tempHighRatingRecipesItem);
 
@@ -314,22 +320,22 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                                                 }
 
                                                 String temp = String.valueOf(listSearch.get(0).isFavourite() + " " + listSearch.get(0).getId());
-                                                Log.d(TAG, temp);
+                                                Log.d(TAG , temp);
 
 
                                             }
                                             searchRecyclerView.setLayoutManager(linearLayoutManagerVertical);
-                                            searchRecyclerView.setAdapter(new RecommendedRecipesAdapter(getApplicationContext(), listSearch));
+                                            searchRecyclerView.setAdapter(new RecommendedRecipesAdapter(getApplicationContext() , listSearch));
 
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
 
                                     }
-                                }, new Response.ErrorListener() {
+                                } , new Response.ErrorListener() {
 
                                     @Override
-                                    public void onErrorResponse(VolleyError error) {
+                                    public void onErrorResponse( VolleyError error ) {
                                         // TODO: Handle error
                                         error.printStackTrace();
                                     }
@@ -339,8 +345,8 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
 
                             public Map<String, String> getHeaders() {
                                 HashMap<String, String> headers = new HashMap<>();
-                                headers.put("X-Rapidapi-Key", "d061eda37cmshd8c99b385f1e685p177488jsn6dcbb4585857\n");
-                                headers.put("X-Rapidapi-Host", "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
+                                headers.put("X-Rapidapi-Key" , "d061eda37cmshd8c99b385f1e685p177488jsn6dcbb4585857\n");
+                                headers.put("X-Rapidapi-Host" , "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
                                 return headers;
                             }
 //                            @Override
@@ -350,7 +356,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
 //                                params.put("number","10");
 //                                return params;
 //                            }
-                           };
+                        };
 
                         queue.add(jsonObjectRequest);
                     }
@@ -358,6 +364,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
     }
 
     @Override
-    public void onClick(View view) {
+    public void onClick( View view ) {
+
     }
 }

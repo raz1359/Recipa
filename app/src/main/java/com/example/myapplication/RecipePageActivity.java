@@ -238,7 +238,16 @@ public class RecipePageActivity extends AppCompatActivity implements View.OnClic
         ivPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick( View view ) {
-                t1.stop();
+                if (!t1.isSpeaking()) {
+                    t1.speak(Jsoup.parse(desc).text(), TextToSpeech.QUEUE_FLUSH, null);
+                    ivPause.setImageResource(R.drawable.pause_icon);
+
+                } else {
+                    t1.stop();
+                    ivPause.setImageResource(R.drawable.play_icon);
+
+
+                }
             }
         });
 

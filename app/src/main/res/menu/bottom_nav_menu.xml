@@ -13,8 +13,4 @@
         android:id="@+id/shoppingBT"
         android:title=""
         android:icon="@drawable/shopping_selector"></item>
-    <item
-        android:id="@+id/userBT"
-        android:title=""
-        android:icon="@drawable/user_selector"></item>
 </menu>
