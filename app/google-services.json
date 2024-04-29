@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:721609902633:android:c5602bb7c037dcfde6ea38",
         "android_client_info": {
-          "package_name": "com.example.myapplication"
+          "package_name": "me.raz.recipa"
         }
       },
       "oauth_client": [
