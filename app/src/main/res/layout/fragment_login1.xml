@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:translationY="-10dp"
-    tools:context=".FragmentLogin1">
+    tools:context=".activity.sign.SignInActivity">
 
     <!-- TODO: Update blank fragment layout -->
 
